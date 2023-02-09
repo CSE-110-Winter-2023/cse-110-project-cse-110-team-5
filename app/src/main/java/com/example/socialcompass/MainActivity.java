@@ -41,14 +41,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-            float degree = (float) Math.toDegrees(Math.atan2(sensorEvent.values[0], sensorEvent.values[1]));
+            float degree = -1f * (float) Math.toDegrees(Math.atan2(sensorEvent.values[0], sensorEvent.values[1]));
 
             RotateAnimation ra = new RotateAnimation(
                     currentDegree,
                     -degree,
-                    Animation.RELATIVE_TO_SELF, 0f,
-                    Animation.RELATIVE_TO_SELF,
-                    0.5f);
+                    Animation.RELATIVE_TO_SELF, 0.48f,
+                    Animation.RELATIVE_TO_SELF, 1.35f
+            );
             ra.setDuration(210);
             ra.setFillAfter(true);
             arrowImage.startAnimation(ra);
