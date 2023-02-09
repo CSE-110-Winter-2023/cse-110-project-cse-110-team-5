@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/circle"
         android:layout_width="404dp"
         android:layout_height="388dp"
         android:layout_marginTop="171dp"
@@ -17,4 +17,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/circle_removebg_preview" />
+
+    <ImageView
+        android:id="@+id/arrow"
+        android:layout_width="117dp"
+        android:layout_height="68dp"
+        android:layout_marginStart="253dp"
+        android:layout_marginTop="39dp"
+        android:layout_marginEnd="42dp"
+        android:layout_marginBottom="65dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/circle"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/arrow" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
