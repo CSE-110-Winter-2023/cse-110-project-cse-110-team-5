@@ -10,140 +10,180 @@
         android:id="@+id/backButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
         android:text="Back to Main"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.134"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.957" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="387dp"
-        android:layout_height="392dp"
+    <TextView
+        android:id="@+id/houseTextView"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:text="Your House"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/houseLabelEditText"
+        app:layout_constraintHorizontal_bias="0.075"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.263" />
+
+    <EditText
+        android:id="@+id/houseLongEditText"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:ems="10"
+        android:hint="Longitude"
+        android:inputType="numberSigned|numberDecimal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.938"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.342" />
 
-        <TextView
-            android:id="@+id/houseTextView"
-            android:layout_width="176dp"
-            android:layout_height="42dp"
-            android:text="Your House"
-            android:textSize="20sp"
-            tools:layout_editor_absoluteX="216dp"
-            tools:layout_editor_absoluteY="31dp" />
+    <EditText
+        android:id="@+id/houseLabelEditText"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:ems="10"
+        android:hint="Label"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.938"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.263" />
 
-        <EditText
-            android:id="@+id/friendLatEditText"
-            android:layout_width="186dp"
-            android:layout_height="45dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Latitude"
-            tools:layout_editor_absoluteX="18dp"
-            tools:layout_editor_absoluteY="323dp" />
+    <EditText
+        android:id="@+id/houseLatEditText"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:ems="10"
+        android:hint="Latitude"
+        android:inputType="numberSigned|numberDecimal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.079"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.342" />
 
-        <EditText
-            android:id="@+id/houseLabelEditText"
-            android:layout_width="173dp"
-            android:layout_height="45dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Label"
-            tools:layout_editor_absoluteX="216dp"
-            tools:layout_editor_absoluteY="85dp" />
+    <EditText
+        android:id="@+id/friendLongEditText"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Longitude"
+        android:inputType="numberSigned|numberDecimal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.929"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.775" />
 
-        <EditText
-            android:id="@+id/friendLabelEditText"
-            android:layout_width="178dp"
-            android:layout_height="43dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Label"
-            tools:layout_editor_absoluteX="217dp"
-            tools:layout_editor_absoluteY="323dp" />
+    <EditText
+        android:id="@+id/friendLabelEditText"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:ems="10"
+        android:hint="Label"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.929"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.696" />
 
-        <EditText
-            android:id="@+id/friendLongEditText"
-            android:layout_width="186dp"
-            android:layout_height="44dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Longitude"
-            tools:layout_editor_absoluteX="18dp"
-            tools:layout_editor_absoluteY="267dp" />
+    <TextView
+        android:id="@+id/friendTextView"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:text="Friend's House"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.696" />
 
-        <TextView
-            android:id="@+id/familyTextView"
-            android:layout_width="176dp"
-            android:layout_height="42dp"
-            android:text="Family's House"
-            android:textSize="20sp"
-            tools:layout_editor_absoluteX="216dp"
-            tools:layout_editor_absoluteY="146dp" />
+    <EditText
+        android:id="@+id/friendLatEditText"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:ems="10"
+        android:hint="Latitude"
+        android:inputType="numberSigned|numberDecimal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.775" />
 
-        <TextView
-            android:id="@+id/friendTextView"
-            android:layout_width="176dp"
-            android:layout_height="42dp"
-            android:text="Friend's House"
-            android:textSize="20sp"
-            tools:layout_editor_absoluteX="216dp"
-            tools:layout_editor_absoluteY="269dp" />
+    <EditText
+        android:id="@+id/familyLongEditText"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:ems="10"
+        android:hint="Longitude"
+        android:inputType="numberSigned|numberDecimal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.929"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.565" />
 
-        <EditText
-            android:id="@+id/houseLatEditText"
-            android:layout_width="186dp"
-            android:layout_height="45dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Latitude"
-            tools:layout_editor_absoluteX="18dp"
-            tools:layout_editor_absoluteY="88dp" />
+    <TextView
+        android:id="@+id/familyTextView"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:text="Family's House"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/backButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.506" />
 
-        <EditText
-            android:id="@+id/houseLongEditText"
-            android:layout_width="185dp"
-            android:layout_height="44dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Longitude"
-            tools:layout_editor_absoluteX="18dp"
-            tools:layout_editor_absoluteY="31dp" />
+    <EditText
+        android:id="@+id/familyLabelEditText"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:ems="10"
+        android:hint="Label"
+        android:inputType="textPersonName"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.929"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.485" />
 
-        <EditText
-            android:id="@+id/familyLabelEditText"
-            android:layout_width="178dp"
-            android:layout_height="43dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Label"
-            tools:layout_editor_absoluteX="217dp"
-            tools:layout_editor_absoluteY="204dp" />
-
-        <EditText
-            android:id="@+id/familyLatEditText"
-            android:layout_width="186dp"
-            android:layout_height="45dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Latitude"
-            tools:layout_editor_absoluteX="18dp"
-            tools:layout_editor_absoluteY="201dp" />
-
-        <EditText
-            android:id="@+id/familyLongEditText"
-            android:layout_width="186dp"
-            android:layout_height="44dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Longitude"
-            tools:layout_editor_absoluteX="18dp"
-            tools:layout_editor_absoluteY="149dp" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <EditText
+        android:id="@+id/familyLatEditText"
+        android:layout_width="@dimen/LocationEntryViewWidth"
+        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:ems="10"
+        android:hint="Latitude"
+        android:inputType="numberSigned|numberDecimal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.07"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.565" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
