@@ -8,20 +8,32 @@
 
     <Button
         android:id="@+id/backButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/LocationEntryButtonWidth"
+        android:layout_height="@dimen/LocationEntryButtonHeight"
         android:text="Back to Main"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.134"
+        app:layout_constraintHorizontal_bias="0.07"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.957" />
+        app:layout_constraintVertical_bias="0.918" />
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="@dimen/LocationEntryButtonWidth"
+        android:layout_height="@dimen/LocationEntryButtonHeight"
+        android:text="Save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.929"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.918" />
 
     <TextView
         android:id="@+id/houseTextView"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:text="Your House"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -35,7 +47,7 @@
     <EditText
         android:id="@+id/houseLongEditText"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:ems="10"
         android:hint="Longitude"
         android:inputType="numberSigned|numberDecimal"
@@ -49,7 +61,7 @@
     <EditText
         android:id="@+id/houseLabelEditText"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:ems="10"
         android:hint="Label"
         android:inputType="textPersonName"
@@ -63,7 +75,7 @@
     <EditText
         android:id="@+id/houseLatEditText"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:ems="10"
         android:hint="Latitude"
         android:inputType="numberSigned|numberDecimal"
@@ -91,7 +103,7 @@
     <EditText
         android:id="@+id/friendLabelEditText"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:ems="10"
         android:hint="Label"
         android:inputType="textPersonName"
@@ -105,7 +117,7 @@
     <TextView
         android:id="@+id/friendTextView"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:text="Friend's House"
         android:textSize="20sp"
         android:textStyle="bold"
@@ -119,7 +131,7 @@
     <EditText
         android:id="@+id/friendLatEditText"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:ems="10"
         android:hint="Latitude"
         android:inputType="numberSigned|numberDecimal"
@@ -133,7 +145,7 @@
     <EditText
         android:id="@+id/familyLongEditText"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:ems="10"
         android:hint="Longitude"
         android:inputType="numberSigned|numberDecimal"
@@ -147,21 +159,21 @@
     <TextView
         android:id="@+id/familyTextView"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:text="Family's House"
         android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/backButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.07"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.506" />
+        app:layout_constraintVertical_bias="0.485" />
 
     <EditText
         android:id="@+id/familyLabelEditText"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:ems="10"
         android:hint="Label"
         android:inputType="textPersonName"
@@ -175,7 +187,7 @@
     <EditText
         android:id="@+id/familyLatEditText"
         android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryActivityHeight"
+        android:layout_height="@dimen/LocationEntryViewHeight"
         android:ems="10"
         android:hint="Latitude"
         android:inputType="numberSigned|numberDecimal"

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="LocationEntryViewWidth">185dp</dimen>
-    <dimen name="LocationEntryActivityHeight">45dp</dimen>
+    <dimen name="LocationEntryViewHeight">45dp</dimen>
+    <dimen name="LocationEntryButtonWidth">185dp</dimen>
+    <dimen name="LocationEntryButtonHeight">45dp</dimen>
 </resources>
