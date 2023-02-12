@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Intent intent = new Intent(this, LocationEntryActivity.class);
         startActivity(intent);
     }
-}
 
     @Override
     protected void onResume(){
