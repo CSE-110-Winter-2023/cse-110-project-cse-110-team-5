@@ -2,6 +2,10 @@ package com.example.socialcompass;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.view.View;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -24,6 +28,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         arrowImage = findViewById(R.id.arrow);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+    }
+
+    public void onLocationsButtonClick(View view) {
+        Intent intent = new Intent(this, LocationEntryActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -61,4 +70,3 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //nothing
     }
 }
-
