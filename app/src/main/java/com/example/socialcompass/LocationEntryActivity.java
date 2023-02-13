@@ -1,6 +1,7 @@
 package com.example.socialcompass;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -34,6 +35,8 @@ public class LocationEntryActivity extends AppCompatActivity {
     private EditText latitudeFriend;
     private EditText labelFriend;
 
+    private LocationService locationService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +67,14 @@ public class LocationEntryActivity extends AppCompatActivity {
         longitudeYou.setText(Util.getFloatAsString(preferences, YOU_LONGITUDE));
         latitudeYou.setText(Util.getFloatAsString(preferences, YOU_LATITUDE));
         labelYou.setText(preferences.getString(YOU_LABEL, ""));
+
+        locationService = LocationService.singleton(this);
+
+        calculateAngle();
+
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)familyHouse.getLayoutParams();
+        layoutParams.circleAngle = (float)angle;
+        familyHouse.setLayoutParams(layoutParams);
     }
 
     public void onBackButtonClick(View view) {

@@ -49,4 +49,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <TextView
+        android:id="@+id/familyHouse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Family House"
+        app:layout_constraintCircle="@+id/circle"
+        app:layout_constraintCircleRadius="175dp"
+        tools:layout_editor_absoluteX="274dp"
+        tools:layout_editor_absoluteY="229dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

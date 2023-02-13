@@ -1,8 +1,15 @@
 package com.example.socialcompass;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.util.Log;
 import android.widget.EditText;
+
+import androidx.core.app.ActivityCompat;
 
 public final class Util {
     private Util() { }
