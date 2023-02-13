@@ -54,7 +54,7 @@ public class LocationEntryActivity extends AppCompatActivity {
         latitudeYou = findViewById(R.id.houseLatEditText);
         labelYou = findViewById(R.id.houseLabelEditText);
 
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
 
         longitudeFriend.setText(Util.getFloatAsString(preferences, FRIEND_LONGITUDE));
         latitudeFriend.setText(Util.getFloatAsString(preferences, FRIEND_LATITUDE));
@@ -67,14 +67,6 @@ public class LocationEntryActivity extends AppCompatActivity {
         longitudeYou.setText(Util.getFloatAsString(preferences, YOU_LONGITUDE));
         latitudeYou.setText(Util.getFloatAsString(preferences, YOU_LATITUDE));
         labelYou.setText(preferences.getString(YOU_LABEL, ""));
-
-        locationService = LocationService.singleton(this);
-
-        calculateAngle();
-
-        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)familyHouse.getLayoutParams();
-        layoutParams.circleAngle = (float)angle;
-        familyHouse.setLayoutParams(layoutParams);
     }
 
     public void onBackButtonClick(View view) {
@@ -87,7 +79,7 @@ public class LocationEntryActivity extends AppCompatActivity {
     }
 
     void savePreferences() {
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
         // save relevant fields

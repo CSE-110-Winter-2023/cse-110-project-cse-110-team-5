@@ -22,7 +22,7 @@ public class LocationService implements LocationListener {
 
     private final LocationManager locationManager;
 
-    private static LocationService singleton(Activity activity) {
+    public static LocationService singleton(Activity activity) {
         if (instance == null) {
             instance = new LocationService(activity);
         }

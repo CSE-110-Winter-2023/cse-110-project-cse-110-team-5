@@ -53,10 +53,17 @@
         android:id="@+id/familyHouse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:text="Family House"
+        app:layout_constraintBottom_toTopOf="@+id/circle"
         app:layout_constraintCircle="@+id/circle"
+        app:layout_constraintCircleAngle="0"
         app:layout_constraintCircleRadius="175dp"
-        tools:layout_editor_absoluteX="274dp"
-        tools:layout_editor_absoluteY="229dp" />
+        app:layout_constraintEnd_toStartOf="@+id/circle"
+        app:layout_constraintStart_toEndOf="@+id/circle"
+        app:layout_constraintTop_toBottomOf="@+id/circle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -27,9 +27,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
+    public static final int NO_FAMILY_LOCATION = -1;
+    public static final String FAMILY_LONGITUDE = "familyLongitude";
+    public static final String FAMILY_LATITUDE = "familyLatitude";
+    public static final String YOU_LONGITUDE = "youLongitude";
+    public static final String YOU_LATITUDE = "youLatitude";
     private ImageView arrowImage;
     private SensorManager sensorManager;
     private Sensor magneticFieldSensor;
+    private SharedPreferences preferences;
     private float currentDegree = 0;
     private int ANGLE = 1;
     private TextView familyHouse;
@@ -40,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         arrowImage = findViewById(R.id.arrow);
-
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
@@ -48,46 +53,81 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
+
+        LocationService locationService = LocationService.singleton(this);
+
+        angle = calculateAngle(locationService);
+        if (angle != NO_FAMILY_LOCATION) {
+            familyHouse = findViewById(R.id.familyHouse);
+            familyHouse.setVisibility(View.VISIBLE);
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) familyHouse.getLayoutParams();
+            layoutParams.circleAngle = (float) angle;
+            familyHouse.setLayoutParams(layoutParams);
+        }
+        else {
+            familyHouse = findViewById(R.id.familyHouse);
+            familyHouse.setVisibility(View.INVISIBLE);
+        }
+
     }
 
     public double calculateAngle(LocationService me) {
-        EditText ETFamLongitude = findViewById(R.id.familyLongEditText);
-        EditText ETFamLatitude = findViewById(R.id.familyLatEditText);
-        double famLongitude = Double.parseDouble(String.valueOf(ETFamLongitude.getText()));
-        double famLatitude = Double.parseDouble(String.valueOf(ETFamLatitude.getText()));
-        double longitude = location.getLongitude();
-        double latitude = location.getLatitude();
+        preferences = getSharedPreferences("shared", MODE_PRIVATE);
+        if (preferences.contains(FAMILY_LONGITUDE) &&
+            preferences.contains(FAMILY_LATITUDE) &&
+            preferences.contains(YOU_LONGITUDE) &&
+            preferences.contains(YOU_LATITUDE))
+        {
+            double famLongitude = Double.parseDouble(Util.getFloatAsString(preferences, FAMILY_LONGITUDE));
+            double famLatitude = Math.toRadians(Double.parseDouble(Util.getFloatAsString(preferences, FAMILY_LATITUDE)));
+            double longitude = Double.parseDouble(Util.getFloatAsString(preferences, YOU_LONGITUDE));
+            double latitude = Math.toRadians(Double.parseDouble(Util.getFloatAsString(preferences, YOU_LATITUDE)));
 
-        Log.e("longitude error", String.valueOf(longitude));
-        Log.e("latitude error", String.valueOf(latitude));
-        Log.e("famLong error", String.valueOf(famLongitude));
-        Log.e("famLat error", String.valueOf(famLatitude));
-
-        double longDiff = Math.toRadians(famLongitude-longitude);
-        double y = Math.sin(longDiff) * Math.cos(famLatitude);
-        double x = Math.cos(latitude) * Math.sin(famLatitude) - Math.sin(latitude) * Math.cos(famLatitude) * Math.cos(longDiff);
-        return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+            double longDiff = Math.toRadians(famLongitude-longitude);
+            double y = Math.sin(longDiff)*Math.cos(famLatitude);
+            double x = Math.cos(latitude)*Math.sin(famLatitude)-Math.sin(latitude)*Math.cos(famLatitude)*Math.cos(longDiff);
+            return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+        }
+        else
+        {
+            return NO_FAMILY_LOCATION;
+        }
     }
 
     public void onLocationsButtonClick(View view) {
         Intent intent = new Intent(this, LocationEntryActivity.class);
-        startActivityForResult(intent, ANGLE);
+        startActivity(intent);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        // check if the request code is same as what is passed
-        if(requestCode==1) {
-            angle = data.getDoubleExtra(ANGLE, defaultValue)
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+//    {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        // check if the request code is same as what is passed
+//        if(requestCode==1) {
+//            angle = data.getDoubleExtra(String.valueOf(ANGLE), 0f);
+//        }
+//    }
 
     @Override
     protected void onResume(){
         super.onResume();
         sensorManager.registerListener(this, magneticFieldSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        LocationService locationService = LocationService.singleton(this);
+
+        angle = calculateAngle(locationService);
+        System.out.println(angle);
+        if (angle != NO_FAMILY_LOCATION) {
+            familyHouse = findViewById(R.id.familyHouse);
+            familyHouse.setVisibility(View.VISIBLE);
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) familyHouse.getLayoutParams();
+            layoutParams.circleAngle = (float) angle;
+            familyHouse.setLayoutParams(layoutParams);
+        }
+        else {
+            familyHouse = findViewById(R.id.familyHouse);
+            familyHouse.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
