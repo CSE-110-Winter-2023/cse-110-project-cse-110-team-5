@@ -3,16 +3,21 @@ package com.example.socialcompass;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.LiveData;
 
 
 import android.Manifest;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.location.LocationManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -20,6 +25,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private Sensor magneticFieldSensor;
     private SharedPreferences preferences;
-    private float currentDegree = 0;
+    private float [] currentDegree = {0f, 0f};
+    private float [] initialDegree = {0f, 0f};
     private int ANGLE = 1;
     private TextView familyHouse;
     double angle;
@@ -46,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         arrowImage = findViewById(R.id.arrow);
+        familyHouse = findViewById(R.id.familyHouse);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
@@ -53,45 +61,37 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
         }
-
         LocationService locationService = LocationService.singleton(this);
-
-        angle = calculateAngle(locationService);
-        if (angle != NO_FAMILY_LOCATION) {
-            familyHouse = findViewById(R.id.familyHouse);
-            familyHouse.setVisibility(View.VISIBLE);
-            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) familyHouse.getLayoutParams();
-            layoutParams.circleAngle = (float) angle;
-            familyHouse.setLayoutParams(layoutParams);
-        }
-        else {
-            familyHouse = findViewById(R.id.familyHouse);
-            familyHouse.setVisibility(View.INVISIBLE);
-        }
-
-    }
-
-    public double calculateAngle(LocationService me) {
         preferences = getSharedPreferences("shared", MODE_PRIVATE);
-        if (preferences.contains(FAMILY_LONGITUDE) &&
-            preferences.contains(FAMILY_LATITUDE) &&
-            preferences.contains(YOU_LONGITUDE) &&
-            preferences.contains(YOU_LATITUDE))
-        {
+        // Set family home location/angle
+        if (preferences.contains(FAMILY_LONGITUDE) && preferences.contains(FAMILY_LATITUDE)) {
             double famLongitude = Double.parseDouble(Util.getFloatAsString(preferences, FAMILY_LONGITUDE));
             double famLatitude = Math.toRadians(Double.parseDouble(Util.getFloatAsString(preferences, FAMILY_LATITUDE)));
-            double longitude = Double.parseDouble(Util.getFloatAsString(preferences, YOU_LONGITUDE));
-            double latitude = Math.toRadians(Double.parseDouble(Util.getFloatAsString(preferences, YOU_LATITUDE)));
+            angle = calculateAngle(locationService, famLatitude, famLongitude);
+            if (angle == NO_FAMILY_LOCATION) {
+                familyHouse = findViewById(R.id.familyHouse);
+                familyHouse.setVisibility(View.INVISIBLE);
+            }
+            else {
+                initialDegree[1] = (float)angle;
+                familyHouse = findViewById(R.id.familyHouse);
+                familyHouse.setVisibility(View.VISIBLE);
+            }
+        }
+    }
 
-            double longDiff = Math.toRadians(famLongitude-longitude);
-            double y = Math.sin(longDiff)*Math.cos(famLatitude);
-            double x = Math.cos(latitude)*Math.sin(famLatitude)-Math.sin(latitude)*Math.cos(famLatitude)*Math.cos(longDiff);
-            return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+    public double calculateAngle(LocationService locationService, double latitude2, double longitude2) {
+        Pair<Double, Double> location = locationService.getLocation().getValue();
+        if (location != null) {
+            double latitude = Math.toRadians(location.first);
+            double longitude = Math.toRadians(location.second);
+            double longDiff = Math.toRadians(longitude2-longitude);
+            double y = Math.sin(longDiff)*Math.cos(latitude2);
+            double x = Math.cos(latitude)*Math.sin(latitude2)-Math.sin(latitude)*Math.cos(latitude2)*Math.cos(longDiff);
+            double angle = (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+            return angle;
         }
-        else
-        {
-            return NO_FAMILY_LOCATION;
-        }
+        return -1;
     }
 
     public void onLocationsButtonClick(View view) {
@@ -114,19 +114,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onResume();
         sensorManager.registerListener(this, magneticFieldSensor, SensorManager.SENSOR_DELAY_NORMAL);
         LocationService locationService = LocationService.singleton(this);
-
-        angle = calculateAngle(locationService);
-        System.out.println(angle);
-        if (angle != NO_FAMILY_LOCATION) {
-            familyHouse = findViewById(R.id.familyHouse);
-            familyHouse.setVisibility(View.VISIBLE);
-            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) familyHouse.getLayoutParams();
-            layoutParams.circleAngle = (float) angle;
-            familyHouse.setLayoutParams(layoutParams);
-        }
-        else {
-            familyHouse = findViewById(R.id.familyHouse);
-            familyHouse.setVisibility(View.INVISIBLE);
+        preferences = getSharedPreferences("shared", MODE_PRIVATE);
+        // Set family home location/angle
+        if (preferences.contains(FAMILY_LONGITUDE) && preferences.contains(FAMILY_LATITUDE)) {
+            double famLongitude = Double.parseDouble(Util.getFloatAsString(preferences, FAMILY_LONGITUDE));
+            double famLatitude = Math.toRadians(Double.parseDouble(Util.getFloatAsString(preferences, FAMILY_LATITUDE)));
+            angle = calculateAngle(locationService, famLatitude, famLongitude);
+            if (angle == NO_FAMILY_LOCATION) {
+                familyHouse = findViewById(R.id.familyHouse);
+                familyHouse.setVisibility(View.INVISIBLE);
+            }
+            else {
+                initialDegree[1] = (float)angle;
+                familyHouse = findViewById(R.id.familyHouse);
+                familyHouse.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -136,21 +138,39 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.unregisterListener(this);
     }
 
+    private void rotateView(View view, float startAngle, float endAngle, float initialDegree) {
+        ValueAnimator anim = ValueAnimator.ofFloat(startAngle, endAngle);
+        anim.addUpdateListener(valueAnimator -> {
+            float val = (Float) valueAnimator.getAnimatedValue();
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
+            layoutParams.circleAngle = val + initialDegree;
+            view.setLayoutParams(layoutParams);
+        });
+        anim.setDuration(210);
+        anim.setInterpolator(new LinearInterpolator());
+        RotateAnimation ra = new RotateAnimation(
+                startAngle,
+                endAngle,
+                Animation.RELATIVE_TO_SELF, 0.5f,
+                Animation.RELATIVE_TO_SELF, 0.5f
+        );
+        ra.setDuration(210);
+        ra.setFillAfter(true);
+        anim.start();
+        view.startAnimation(ra);
+    }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             float degree = -1f * (float) Math.toDegrees(Math.atan2(sensorEvent.values[0], sensorEvent.values[1]));
-
-            RotateAnimation ra = new RotateAnimation(
-                    currentDegree,
-                    -degree,
-                    Animation.RELATIVE_TO_SELF, 0.48f,
-                    Animation.RELATIVE_TO_SELF, 1.35f
-            );
-            ra.setDuration(210);
-            ra.setFillAfter(true);
-            arrowImage.startAnimation(ra);
-            currentDegree = -degree;
+            familyHouse = findViewById(R.id.familyHouse);
+            arrowImage = findViewById(R.id.arrow);
+            View [] rotationElements = {arrowImage, familyHouse};
+            for (int i = 0; i < rotationElements.length; i++) {
+                rotateView(rotationElements[i], currentDegree[i], -degree, initialDegree[i]);
+                currentDegree[i] = -degree;
+            }
         }
     }
 
