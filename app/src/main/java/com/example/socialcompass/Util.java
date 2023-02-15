@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.EditText;
 
+
 public final class Util {
     private Util() { }
 

@@ -1,6 +1,7 @@
 package com.example.socialcompass;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -34,6 +35,8 @@ public class LocationEntryActivity extends AppCompatActivity {
     private EditText latitudeFriend;
     private EditText labelFriend;
 
+    private LocationService locationService;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +54,7 @@ public class LocationEntryActivity extends AppCompatActivity {
         latitudeYou = findViewById(R.id.houseLatEditText);
         labelYou = findViewById(R.id.houseLabelEditText);
 
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
 
         longitudeFriend.setText(Util.getFloatAsString(preferences, FRIEND_LONGITUDE));
         latitudeFriend.setText(Util.getFloatAsString(preferences, FRIEND_LATITUDE));
@@ -76,7 +79,7 @@ public class LocationEntryActivity extends AppCompatActivity {
     }
 
     void savePreferences() {
-        SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
 
         // save relevant fields

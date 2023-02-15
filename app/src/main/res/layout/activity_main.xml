@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraint_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -22,8 +23,8 @@
 
     <ImageView
         android:id="@+id/arrow"
-        android:layout_width="158dp"
-        android:layout_height="65dp"
+        android:layout_width="147dp"
+        android:layout_height="166dp"
         android:layout_marginStart="126dp"
         android:layout_marginTop="97dp"
         android:layout_marginEnd="120dp"
@@ -31,6 +32,9 @@
         android:rotation="90"
         android:scaleX="-1"
         app:layout_constraintBottom_toBottomOf="@+id/circle"
+        app:layout_constraintCircle="@id/circle"
+        app:layout_constraintCircleAngle="0"
+        app:layout_constraintCircleRadius="0dp"
         app:layout_constraintEnd_toEndOf="@+id/circle"
         app:layout_constraintStart_toStartOf="@+id/circle"
         app:layout_constraintTop_toTopOf="@+id/circle"
@@ -48,5 +52,23 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/familyHouse"
+        android:layout_width="70dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:text="Family House"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toTopOf="@id/arrow"
+        app:layout_constraintCircle="@+id/circle"
+        app:layout_constraintCircleAngle="0"
+        app:layout_constraintCircleRadius="155dp"
+        app:layout_constraintEnd_toStartOf="@id/arrow"
+        app:layout_constraintStart_toEndOf="@id/arrow"
+        app:layout_constraintTop_toBottomOf="@id/arrow" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
