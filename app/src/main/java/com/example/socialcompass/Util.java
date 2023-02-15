@@ -14,6 +14,8 @@ public final class Util {
             if (str != null && !str.equals("")) {
                 float parsed = Float.parseFloat(str);
                 editor.putFloat(key, parsed);
+            } else {
+                editor.remove(key);
             }
         } catch (NumberFormatException e) {
             Log.e("error", "Could not parse float " + str + ".");
