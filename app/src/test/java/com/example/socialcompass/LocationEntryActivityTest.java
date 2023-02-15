@@ -34,7 +34,7 @@ public class LocationEntryActivityTest {
             var saveBtn = (Button) activity.findViewById(R.id.saveButton);
             saveBtn.performClick(); // we do a little saving >:)
             // check preferences
-            var preferences = activity.getPreferences(Context.MODE_PRIVATE);
+            var preferences = activity.getSharedPreferences("shared", Context.MODE_PRIVATE);
             String defaultValue = "no dice :(";
             String actualFamilyLabel = preferences.getString(LocationEntryActivity.FAMILY_LABEL, defaultValue);
             // testing

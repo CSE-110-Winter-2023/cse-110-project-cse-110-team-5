@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final String [][] KEYS = {{}, FAMILY_KEYS};
 
     // Instance variables
+    private LocationService locationService;
     private SensorManager sensorManager;
     private Sensor magneticFieldSensor;
     private SharedPreferences preferences;
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private View [] markers;
 
     private void setMarkerAngles() {
-        LocationService locationService = LocationService.singleton(this);
         for (int i = 1; i < NUM_MARKERS; i++) {
             String latKey = KEYS[i][0];
             String longKey = KEYS[i][1];
@@ -93,6 +93,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         currentDegrees = new float[NUM_MARKERS];
         initialDegrees = new float[NUM_MARKERS];
         markers = new View[NUM_MARKERS];
+        locationService = LocationService.singleton(this);
+        locationService.getLocation().observe(this, location -> {
+            setMarkerAngles();
+        });
 
         // View initialization
         setContentView(R.layout.activity_main);
