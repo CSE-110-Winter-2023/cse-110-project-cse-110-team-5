@@ -9,13 +9,18 @@ import android.widget.EditText;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.rule.GrantPermissionRule;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 
 @RunWith(RobolectricTestRunner.class)
 public class LocationEntryActivityTest {
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
+
     @Test
     public void testIfLocationSaved() {
         var scenario = ActivityScenario.launch(LocationEntryActivity.class);
@@ -29,7 +34,7 @@ public class LocationEntryActivityTest {
             var saveBtn = (Button) activity.findViewById(R.id.saveButton);
             saveBtn.performClick(); // we do a little saving >:)
             // check preferences
-            var preferences = activity.getPreferences(Context.MODE_PRIVATE);
+            var preferences = activity.getSharedPreferences("shared", Context.MODE_PRIVATE);
             String defaultValue = "no dice :(";
             String actualFamilyLabel = preferences.getString(LocationEntryActivity.FAMILY_LABEL, defaultValue);
             // testing
