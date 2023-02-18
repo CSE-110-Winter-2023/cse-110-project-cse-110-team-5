@@ -93,6 +93,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         currentDegrees = new float[NUM_MARKERS];
         initialDegrees = new float[NUM_MARKERS];
         markers = new View[NUM_MARKERS];
+        // Set permissions if not already set
+        setPermissions();
         locationService = LocationService.singleton(this);
         locationService.getLocation().observe(this, location -> {
             setMarkerAngles();

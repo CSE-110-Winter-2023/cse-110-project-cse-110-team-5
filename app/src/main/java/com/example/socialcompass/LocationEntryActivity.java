@@ -86,6 +86,18 @@ public class LocationEntryActivity extends AppCompatActivity {
         savePreferences();
     }
 
+    public void onMockDegreesButtonClick(View view) {
+        if (Integer.parseInt(String.valueOf(degrees.getText())) >= 0) {
+            if (Integer.parseInt(String.valueOf(degrees.getText())) < 360) {
+                SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
+                SharedPreferences.Editor editor = preferences.edit();
+                Util.saveFloat(editor, degrees, UI_DEGREES);
+                editor.apply();
+                finish();
+            }
+        }
+    }
+
     void savePreferences() {
         SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -104,7 +116,7 @@ public class LocationEntryActivity extends AppCompatActivity {
         Util.saveFloat(editor, latitudeYou, YOU_LATITUDE);
         editor.putString(YOU_LABEL, labelYou.getText().toString());
 
-        Util.saveFloat(editor, degrees, UI_DEGREES);
+        //Util.saveFloat(editor, degrees, UI_DEGREES);
 
         editor.apply();
     }
