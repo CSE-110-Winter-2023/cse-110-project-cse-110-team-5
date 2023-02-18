@@ -23,6 +23,8 @@ public class LocationEntryActivity extends AppCompatActivity {
     public static final String FRIEND_LATITUDE = "friendLatitude";
     public static final String FRIEND_LABEL = "friendLabel";
 
+    public static final String UI_DEGREES = "degreeLabel";
+
     private EditText longitudeFamily;
     private EditText latitudeFamily;
     private EditText labelFamily;
@@ -34,6 +36,8 @@ public class LocationEntryActivity extends AppCompatActivity {
     private EditText longitudeFriend;
     private EditText latitudeFriend;
     private EditText labelFriend;
+
+    private EditText degrees;
 
     private LocationService locationService;
 
@@ -54,6 +58,8 @@ public class LocationEntryActivity extends AppCompatActivity {
         latitudeYou = findViewById(R.id.houseLatEditText);
         labelYou = findViewById(R.id.houseLabelEditText);
 
+        degrees = findViewById(R.id.degreesEditText);
+
         SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
 
         longitudeFriend.setText(Util.getFloatAsString(preferences, FRIEND_LONGITUDE));
@@ -67,6 +73,8 @@ public class LocationEntryActivity extends AppCompatActivity {
         longitudeYou.setText(Util.getFloatAsString(preferences, YOU_LONGITUDE));
         latitudeYou.setText(Util.getFloatAsString(preferences, YOU_LATITUDE));
         labelYou.setText(preferences.getString(YOU_LABEL, ""));
+
+        degrees.setText(Util.getFloatAsString(preferences, UI_DEGREES));
     }
 
     public void onBackButtonClick(View view) {
@@ -95,6 +103,8 @@ public class LocationEntryActivity extends AppCompatActivity {
         Util.saveFloat(editor, longitudeYou, YOU_LONGITUDE);
         Util.saveFloat(editor, latitudeYou, YOU_LATITUDE);
         editor.putString(YOU_LABEL, labelYou.getText().toString());
+
+        Util.saveFloat(editor, degrees, UI_DEGREES);
 
         editor.apply();
     }
