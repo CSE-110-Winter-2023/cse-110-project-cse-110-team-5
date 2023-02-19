@@ -40,7 +40,7 @@ public class MainActivityTest {
     }
 
     @Test
-    public void testArrowOrientation(){
+    public void testArrowOrientatedNorth(){
         var scenario = ActivityScenario.launch(MainActivity.class);
         scenario.moveToState(Lifecycle.State.CREATED);
         scenario.moveToState(Lifecycle.State.STARTED);
