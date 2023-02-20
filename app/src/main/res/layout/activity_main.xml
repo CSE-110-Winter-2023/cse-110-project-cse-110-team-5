@@ -48,7 +48,7 @@
         android:layout_marginEnd="157dp"
         android:layout_marginBottom="85dp"
         android:onClick="onLocationsButtonClick"
-        android:text="Locations"
+        android:text="@string/locations"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -61,7 +61,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        android:text="Family House"
+        android:text="@string/parents"
         android:textAlignment="center"
         app:layout_constraintBottom_toTopOf="@id/arrow"
         app:layout_constraintCircle="@+id/circle"

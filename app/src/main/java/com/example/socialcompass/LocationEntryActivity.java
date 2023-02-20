@@ -1,11 +1,8 @@
 package com.example.socialcompass;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
@@ -38,8 +35,6 @@ public class LocationEntryActivity extends AppCompatActivity {
     private EditText labelFriend;
 
     private EditText degrees;
-
-    private LocationService locationService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

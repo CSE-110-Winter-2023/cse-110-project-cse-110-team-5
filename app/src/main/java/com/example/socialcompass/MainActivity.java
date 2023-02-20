@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     // Constants
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final int ANIMATION_DURATION = 210;
 
     // SharedPreferences keys
-    private static final String [] FAMILY_KEYS = {"familyLatitude", "familyLongitude"};
+    private static final String [] FAMILY_KEYS = {"familyLatitude", "familyLongitude", "familyLabel", "Parents"};
     private static final String [][] KEYS = {{}, FAMILY_KEYS};
 
     // Instance variables
@@ -52,6 +53,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 else {
                     initialDegrees[i] = (float)angle;
                     markers[i].setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    }
+
+    private void setMarkerLabels() {
+        for (int i = 1; i < NUM_MARKERS; i++) {
+            String labelKey = KEYS[i][2];
+            if (preferences.contains(labelKey)) {
+                String label = preferences.getString(labelKey, null);
+                if (label == null || label.equals("")) {
+                    ((TextView) markers[i]).setText(KEYS[i][3]);
+                    continue;
                 }
             }
         }
@@ -86,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Instance variable intialization
+        // Instance variable initialization
         preferences = getSharedPreferences("shared", MODE_PRIVATE);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -96,9 +110,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Set permissions if not already set
         setPermissions();
         locationService = LocationService.singleton(this);
-        locationService.getLocation().observe(this, location -> {
-            setMarkerAngles();
-        });
+        locationService.getLocation().observe(this, location -> setMarkerAngles());
 
         // View initialization
         setContentView(R.layout.activity_main);
@@ -108,8 +120,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Set permissions if not already set
         setPermissions();
 
-        // Set initial angles for all markers
+        // Set initial angles and labels for all markers
         setMarkerAngles();
+        setMarkerLabels();
     }
 
     public void onLocationsButtonClick(View view) {
@@ -124,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // Set all markers
         setMarkerAngles();
+        setMarkerLabels();
     }
 
     @Override
