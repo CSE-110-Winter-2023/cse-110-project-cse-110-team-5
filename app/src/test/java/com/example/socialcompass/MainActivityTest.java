@@ -1,7 +1,6 @@
 package com.example.socialcompass;
 
 
-
 import static android.content.Context.MODE_PRIVATE;
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,6 +21,7 @@ import androidx.test.rule.GrantPermissionRule;
 
 @RunWith(RobolectricTestRunner.class)
 public class MainActivityTest {
+
     private ActivityScenario<MainActivity> scenario;
 
     @Rule
@@ -35,7 +35,6 @@ public class MainActivityTest {
     }
 
     @Test
-
     public void testIfArrowDisplayed() {
         scenario.onActivity(activity -> {
             ImageView arrow = (ImageView) activity.findViewById(R.id.arrow);
