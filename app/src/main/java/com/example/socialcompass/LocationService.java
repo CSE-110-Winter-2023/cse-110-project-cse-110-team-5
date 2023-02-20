@@ -14,6 +14,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
+/**
+ * An implementation of a location service using the singleton design pattern.
+ * Handles location permission checking and updating.
+ */
 public class LocationService implements LocationListener {
     private static LocationService instance;
     private Activity activity;
@@ -22,6 +26,13 @@ public class LocationService implements LocationListener {
 
     private final LocationManager locationManager;
 
+    /**
+     * Constructor
+     *
+     * Ensures only one instance of locationManager is ever present
+     * by controlling the LocationService constructor call
+     * @param activity
+     */
     public static LocationService singleton(Activity activity) {
         if (instance == null) {
             instance = new LocationService(activity);
@@ -29,14 +40,24 @@ public class LocationService implements LocationListener {
         return instance;
     }
 
+    /**
+     * Constructor
+     *
+     * Called in singleton method
+     * @param activity
+     */
     protected LocationService (Activity activity) {
-        this.locationValue = new MutableLiveData<> ();
+        this.locationValue = new MutableLiveData<>();
         this.activity = activity;
         this.locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
         // Register sensor listeners
-        this.registerLocationListener ();
+        this.registerLocationListener();
     }
 
+
+    /**
+     *  Check for location permissions before registering location manager.
+     */
     private void registerLocationListener() {
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
