@@ -45,7 +45,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             if (preferences.contains(latKey) && preferences.contains(longKey)) {
                 double markerLongitude = Double.parseDouble(Util.getFloatAsString(preferences, longKey));
                 double markerLatitude = Double.parseDouble(Util.getFloatAsString(preferences, latKey));
-                double angle = calculateAngle(locationService, markerLatitude, markerLongitude);
+                double angle;
+                if (preferences.contains(LocationEntryActivity.UI_DEGREES)) {
+                    angle = preferences.getFloat(LocationEntryActivity.UI_DEGREES, 0);
+                } else {
+                    angle = calculateAngle(locationService, markerLatitude, markerLongitude);
+                }
                 if (angle == NO_LOCATION) {
                     markers[i].setVisibility(View.INVISIBLE);
                 }
