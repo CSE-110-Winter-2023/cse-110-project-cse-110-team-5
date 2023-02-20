@@ -132,27 +132,18 @@ public class MainActivityTest {
         scenario.onActivity(activity -> {
             SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
-
             MockLocationService locationService = new MockLocationService(activity);
             TextView family = (TextView) activity.findViewById(R.id.familyHouse);
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
-            editor.putFloat("familyLatitude", 30f);
-            editor.putFloat("familyLongitude", 0f);
+            locationService.setLocation(30, 0);
+            editor.putFloat("familyLatitude", 0);
+            editor.putFloat("familyLongitude", 0);
             editor.apply();
             activity.setMarkerAngles(locationService);
-            float initialX = family.getX();
-            float initialY = family.getY();
-            System.out.println(layoutParams.circleAngle);
-            locationService.setLocation(100, 100);
-
-            /**
-            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
-            editor.putFloat("familyLatitude", 30f);
-            editor.putFloat("familyLongitude", 0f);
-            editor.apply();
+            assertEquals(180, layoutParams.circleAngle, 0);
+            locationService.setLocation(0, -30);
             activity.setMarkerAngles(locationService);
-            System.out.println(family.getX());
-             **/
+            assertEquals(90, layoutParams.circleAngle, 0);
         });
     }
 }
