@@ -1,7 +1,11 @@
+/**
+ * Main Activity: Basic app functionality. Defines how markers on the main page should behave.
+ * Contributors:
+ * Emails:
+ */
 package com.example.socialcompass;
 
 import static com.example.socialcompass.LocationEntryActivity.UI_DEGREES;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -41,6 +45,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float [] initialDegrees;
     private View [] markers;
 
+    /**
+     * Sets the angles of all the markers according to their coordinates and the device orientation
+     * @param locationService: the LocationService of the device, or a mock object
+     */
     protected void setMarkerAngles(LocationService locationService) {
         for (int i = 1; i < NUM_MARKERS; i++) {
             String latKey = KEYS[i][0];
@@ -64,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    /**
+     * Sets the labels of each marker according to the entry in LocationEntryActivity
+     */
     protected void setMarkerLabels() {
         for (int i = 1; i < NUM_MARKERS; i++) {
             String labelKey = KEYS[i][2];
@@ -82,23 +93,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    /*
-     * Takes in latitude and longitude in DEGREES
+    /**
+     * Calculates the angle between the device and a given set of coordinates
+     * @param locationService: The LocationService for the device, or a mock object
+     * @param latitude: The latitude of the target coordinates
+     * @param longitude: The longitude of the target coordinates
+     * @return The angle between the device and the target coordinates as a double
      */
-    protected double calculateAngle(LocationService locationService, double latitude2, double longitude2) {
+    protected double calculateAngle(LocationService locationService, double latitude, double longitude) {
         Pair<Double, Double> location = locationService.getLocation().getValue();
         if (location != null) {
-            double latitude = Math.toRadians(location.first);
-            latitude2 = Math.toRadians(latitude2);
-            double longitude = location.second;
-            double longDiff = Math.toRadians(longitude2-longitude);
-            double y = Math.sin(longDiff)*Math.cos(latitude2);
-            double x = Math.cos(latitude)*Math.sin(latitude2)-Math.sin(latitude)*Math.cos(latitude2)*Math.cos(longDiff);
+            double devLatitude = Math.toRadians(location.first);
+            latitude = Math.toRadians(latitude);
+            double devLongitude = location.second;
+            double longDiff = Math.toRadians(longitude-devLongitude);
+            double y = Math.sin(longDiff)*Math.cos(latitude);
+            double x = Math.cos(devLatitude)*Math.sin(latitude)-Math.sin(devLatitude)*Math.cos(latitude)*Math.cos(longDiff);
             return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
         }
         return NO_LOCATION;
     }
 
+    /**
+     * Asks user to grant location permissions to the app
+     */
     private void setPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
             ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -107,6 +125,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    /**
+     * App behavior when launched
+     * @param savedInstanceState: The saved state of the app
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -136,11 +158,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setMarkerLabels();
     }
 
+    /**
+     * Behavior of Location button
+     * @param view: The ButtonView that triggered the method
+     */
     public void onLocationsButtonClick(View view) {
         Intent intent = new Intent(this, LocationEntryActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * App behavior when resumed
+     */
     @Override
     protected void onResume(){
         super.onResume();
@@ -151,13 +180,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setMarkerLabels();
     }
 
+    /**
+     * App behavior when paused
+     */
     @Override
     protected void onPause(){
         super.onPause();
         sensorManager.unregisterListener(this);
     }
 
+    /**
+     * Rotates a given View according to orientation and location
+     * @param view: The view to rotate
+     * @param startAngle: The current angle of the view
+     * @param endAngle: The ending angle of the view
+     * @param initialDegree: The angle of the coordinates of the view with respect to 0 degrees
+     */
     private void rotateView(View view, float startAngle, float endAngle, float initialDegree) {
+        // Change circle constraint angle
         ValueAnimator anim = ValueAnimator.ofFloat(startAngle, endAngle);
         anim.addUpdateListener(valueAnimator -> {
             float val = (Float) valueAnimator.getAnimatedValue();
@@ -167,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
         anim.setDuration(ANIMATION_DURATION);
         anim.setInterpolator(new LinearInterpolator());
+        // Change marker orientation
         RotateAnimation ra = new RotateAnimation(
                 startAngle,
                 endAngle,
@@ -179,6 +220,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         view.startAnimation(ra);
     }
 
+    /**
+     * App behavior when there is a change in device orientation
+     * @param sensorEvent: the change in device orientation
+     */
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
@@ -192,6 +237,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    /**
+     * Updates the orientation of each marker
+     * @param degree: how much to rotate each marker
+     */
     private void updateOrientation(float degree) {
         for (int i = 0; i < NUM_MARKERS; i++) {
             rotateView(markers[i], currentDegrees[i], degree, initialDegrees[i]);
@@ -199,7 +248,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-
+    /**
+     * Partner method to onLocationChange
+     * @param sensor: sensor that changed
+     * @param i: how much the sensor changed
+     */
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
         //nothing
