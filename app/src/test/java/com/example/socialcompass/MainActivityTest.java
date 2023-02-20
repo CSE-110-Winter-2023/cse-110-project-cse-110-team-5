@@ -1,8 +1,8 @@
 package com.example.socialcompass;
 
 
-import static android.content.Context.MODE_PRIVATE;
 
+import static android.content.Context.MODE_PRIVATE;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,6 +35,7 @@ public class MainActivityTest {
     }
 
     @Test
+
     public void testIfArrowDisplayed() {
         scenario.onActivity(activity -> {
             ImageView arrow = (ImageView) activity.findViewById(R.id.arrow);
