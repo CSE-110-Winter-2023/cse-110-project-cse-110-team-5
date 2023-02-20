@@ -62,4 +62,26 @@ public class LocationEntryActivityTest {
             );
         });
     }
+
+    @Test
+    public void testMockUIDegreesSaved() {
+        var scenario = ActivityScenario.launch(LocationEntryActivity.class);
+        scenario.moveToState(Lifecycle.State.CREATED);
+        scenario.moveToState(Lifecycle.State.STARTED);
+
+        scenario.onActivity(activity -> {
+            float dummyDegrees = 25;
+            var degreeLabel = (EditText) activity.findViewById(R.id.degreesEditText);
+            degreeLabel.setText(Float.toString(dummyDegrees));
+            var saveBtn = (Button) activity.findViewById(R.id.mockDegreesButton);
+            saveBtn.performClick();
+            // check preferences
+            var preferences = activity.getSharedPreferences("shared", Context.MODE_PRIVATE);
+            float defaultValue = 0;
+            float actualDegreesLabel = preferences.getFloat(LocationEntryActivity.UI_DEGREES, defaultValue);
+            // testing
+            double DELTA = 0.01;
+            assertEquals("Preferences should be updated", dummyDegrees, actualDegreesLabel, DELTA);
+        });
+    }
 }
