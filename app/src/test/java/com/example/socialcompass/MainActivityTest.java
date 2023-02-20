@@ -1,5 +1,6 @@
 package com.example.socialcompass;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,15 +13,20 @@ import androidx.test.rule.GrantPermissionRule;
 
 @RunWith(RobolectricTestRunner.class)
 public class MainActivityTest {
+    ActivityScenario<MainActivity> scenario;
+
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
 
-    @Test
-    public void testIfArrowDisplayed(){
-        var scenario = ActivityScenario.launch(MainActivity.class);
+    @Before
+    public void init() {
+        scenario = ActivityScenario.launch(MainActivity.class);
         scenario.moveToState(Lifecycle.State.CREATED);
         scenario.moveToState(Lifecycle.State.STARTED);
+    }
 
+    @Test
+    public void testIfArrowDisplayed(){
         scenario.onActivity(activity -> {
             ImageView arrow = (ImageView) activity.findViewById(R.id.arrow);
             assertTrue(arrow.isShown());
@@ -29,10 +35,6 @@ public class MainActivityTest {
 
     @Test
     public void testIfCircleDisplayed(){
-        var scenario = ActivityScenario.launch(MainActivity.class);
-        scenario.moveToState(Lifecycle.State.CREATED);
-        scenario.moveToState(Lifecycle.State.STARTED);
-
         scenario.onActivity(activity -> {
             ImageView circle = (ImageView) activity.findViewById(R.id.circle);
             assertTrue(circle.isShown());
@@ -41,10 +43,6 @@ public class MainActivityTest {
 
     @Test
     public void testArrowOrientatedNorth(){
-        var scenario = ActivityScenario.launch(MainActivity.class);
-        scenario.moveToState(Lifecycle.State.CREATED);
-        scenario.moveToState(Lifecycle.State.STARTED);
-
         scenario.onActivity(activity -> {
             ImageView arrow = (ImageView) activity.findViewById(R.id.arrow);
             assertEquals((int)arrow.getRotation(), 90);
