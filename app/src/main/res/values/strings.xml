@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SocialCompass</string>
+    <string name="parents">Parents</string>
+    <string name="locations">Locations</string>
 </resources>
