@@ -1,26 +1,41 @@
 package com.example.socialcompass;
 
+
+import static android.content.Context.MODE_PRIVATE;
+
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import static org.junit.Assert.*;
+import android.content.SharedPreferences;
+import android.hardware.SensorEvent;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.rule.GrantPermissionRule;
 
 @RunWith(RobolectricTestRunner.class)
 public class MainActivityTest {
+    private ActivityScenario<MainActivity> scenario;
+
     @Rule
     public GrantPermissionRule permissionRule = GrantPermissionRule.grant(android.Manifest.permission.ACCESS_FINE_LOCATION);
 
-    @Test
-    public void testIfArrowDisplayed(){
-        var scenario = ActivityScenario.launch(MainActivity.class);
+    @Before
+    public void init() {
+        scenario = ActivityScenario.launch(MainActivity.class);
         scenario.moveToState(Lifecycle.State.CREATED);
         scenario.moveToState(Lifecycle.State.STARTED);
+    }
 
+    @Test
+    public void testIfArrowDisplayed() {
         scenario.onActivity(activity -> {
             ImageView arrow = (ImageView) activity.findViewById(R.id.arrow);
             assertTrue(arrow.isShown());
@@ -29,10 +44,6 @@ public class MainActivityTest {
 
     @Test
     public void testIfCircleDisplayed(){
-        var scenario = ActivityScenario.launch(MainActivity.class);
-        scenario.moveToState(Lifecycle.State.CREATED);
-        scenario.moveToState(Lifecycle.State.STARTED);
-
         scenario.onActivity(activity -> {
             ImageView circle = (ImageView) activity.findViewById(R.id.circle);
             assertTrue(circle.isShown());
@@ -41,13 +52,74 @@ public class MainActivityTest {
 
     @Test
     public void testArrowOrientatedNorth(){
-        var scenario = ActivityScenario.launch(MainActivity.class);
-        scenario.moveToState(Lifecycle.State.CREATED);
-        scenario.moveToState(Lifecycle.State.STARTED);
-
         scenario.onActivity(activity -> {
             ImageView arrow = (ImageView) activity.findViewById(R.id.arrow);
             assertEquals((int)arrow.getRotation(), 90);
+        });
+    }
+
+    @Test
+    public void testIfFamilyDisplayed() {
+        scenario.onActivity(activity -> {
+            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putFloat("familyLatitude", 30f);
+            editor.putFloat("familyLongitude", -120f);
+            editor.apply();
+            MockLocationService locationService = new MockLocationService(activity);
+            activity.setMarkerAngles(locationService);
+            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
+            assertTrue(family.isShown());
+        });
+    }
+
+    @Test
+    public void testFamilyNotDisplayed() {
+        scenario.onActivity(activity -> {
+            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            if (preferences.contains("familyLatitude")) {
+                editor.remove("familyLatitude");
+            }
+            if (preferences.contains("familyLongitude")) {
+                editor.remove("familyLongitude");
+            }
+            editor.apply();
+            MockLocationService locationService = new MockLocationService(activity);
+            activity.setMarkerAngles(locationService);
+            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
+            assertFalse(family.isShown());
+        });
+    }
+
+    @Test
+    public void testFamilyAngle() {
+        scenario.onActivity(activity -> {
+            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            MockLocationService locationService = new MockLocationService(activity);
+            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
+            editor.putFloat("familyLatitude", 30f);
+            editor.putFloat("familyLongitude", 0f);
+            editor.apply();
+            activity.setMarkerAngles(locationService);
+            assertEquals(0f, layoutParams.circleAngle, 0);
+            editor.putFloat("familyLatitude", 0f);
+            editor.putFloat("familyLongitude", 30f);
+            editor.apply();
+            activity.setMarkerAngles(locationService);
+            assertEquals(90f, layoutParams.circleAngle, 0);
+            editor.putFloat("familyLatitude", -30f);
+            editor.putFloat("familyLongitude", 0f);
+            editor.apply();
+            activity.setMarkerAngles(locationService);
+            assertEquals(180f, layoutParams.circleAngle, 0);
+            editor.putFloat("familyLatitude", 0f);
+            editor.putFloat("familyLongitude", -30f);
+            editor.apply();
+            activity.setMarkerAngles(locationService);
+            assertEquals(270f, layoutParams.circleAngle, 0);
         });
     }
 }
