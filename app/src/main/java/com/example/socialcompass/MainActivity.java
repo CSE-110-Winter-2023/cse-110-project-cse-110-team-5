@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float [] initialDegrees;
     private View [] markers;
 
-    private void setMarkerAngles() {
+    protected void setMarkerAngles(LocationService locationService) {
         for (int i = 1; i < NUM_MARKERS; i++) {
             String latKey = KEYS[i][0];
             String longKey = KEYS[i][1];
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
                 else {
                     initialDegrees[i] = (float)angle;
+                    rotateView(markers[i], currentDegrees[i], currentDegrees[i], initialDegrees[i]);
                     markers[i].setVisibility(View.VISIBLE);
                 }
             }
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    private void setMarkerLabels() {
+    protected void setMarkerLabels() {
         for (int i = 1; i < NUM_MARKERS; i++) {
             String labelKey = KEYS[i][2];
             if (preferences.contains(labelKey)) {
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     /*
      * Takes in latitude and longitude in DEGREES
      */
-    public double calculateAngle(LocationService locationService, double latitude2, double longitude2) {
+    protected double calculateAngle(LocationService locationService, double latitude2, double longitude2) {
         Pair<Double, Double> location = locationService.getLocation().getValue();
         if (location != null) {
             double latitude = Math.toRadians(location.first);
@@ -114,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Set permissions if not already set
         setPermissions();
         locationService = LocationService.singleton(this);
-        locationService.getLocation().observe(this, location -> setMarkerAngles());
+        locationService.getLocation().observe(this, location -> setMarkerAngles(locationService));
 
         // View initialization
         setContentView(R.layout.activity_main);
@@ -125,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setPermissions();
 
         // Set initial angles and labels for all markers
-        setMarkerAngles();
+        setMarkerAngles(locationService);
         setMarkerLabels();
     }
 
@@ -140,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.registerListener(this, magneticFieldSensor, SensorManager.SENSOR_DELAY_NORMAL);
 
         // Set all markers
-        setMarkerAngles();
+        setMarkerAngles(locationService);
         setMarkerLabels();
     }
 
