@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     ((TextView) markers[i]).setText(KEYS[i][3]);
                     continue;
                 }
+                ((TextView) markers[i]).setText(label);
             }
         }
     }
