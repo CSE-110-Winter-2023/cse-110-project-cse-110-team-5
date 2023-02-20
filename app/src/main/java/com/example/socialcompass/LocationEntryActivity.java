@@ -82,15 +82,26 @@ public class LocationEntryActivity extends AppCompatActivity {
     }
 
     public void onMockDegreesButtonClick(View view) {
-        if (Integer.parseInt(String.valueOf(degrees.getText())) >= 0) {
-            if (Integer.parseInt(String.valueOf(degrees.getText())) < 360) {
-                SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
-                SharedPreferences.Editor editor = preferences.edit();
-                Util.saveFloat(editor, degrees, UI_DEGREES);
-                editor.apply();
-                finish();
+        // parse float
+        try {
+            String raw = degrees.getText().toString();
+            SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            if (raw == null || raw.equals("")) {
+                editor.remove(UI_DEGREES);
+            } else {
+                float parsed = Float.parseFloat(degrees.getText().toString());
+                while (parsed < 0) {
+                    parsed += 360;
+                }
+                parsed %= 360;
+                editor.putFloat(UI_DEGREES, parsed);
             }
+            editor.apply();
+        } catch (IllegalArgumentException e) {
+            return;
         }
+        finish();
     }
 
     void savePreferences() {

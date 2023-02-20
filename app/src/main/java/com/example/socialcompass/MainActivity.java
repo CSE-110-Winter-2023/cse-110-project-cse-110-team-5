@@ -1,5 +1,7 @@
 package com.example.socialcompass;
 
+import static com.example.socialcompass.LocationEntryActivity.UI_DEGREES;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -72,6 +74,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
                 ((TextView) markers[i]).setText(label);
             }
+        }
+        if (preferences.contains(UI_DEGREES)) {
+            float orientation = preferences.getFloat(UI_DEGREES, 0f);
+            updateOrientation(orientation);
         }
     }
 
@@ -175,13 +181,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-            float degree = -1f * (float) Math.toDegrees(Math.atan2(sensorEvent.values[0], sensorEvent.values[1]));
-            for (int i = 0; i < NUM_MARKERS; i++) {
-                rotateView(markers[i], currentDegrees[i], -degree, initialDegrees[i]);
-                currentDegrees[i] = -degree;
+            float degree = (float) Math.toDegrees(Math.atan2(sensorEvent.values[0], sensorEvent.values[1]));
+            // check if ui mock is on
+            var preferences = getSharedPreferences("shared", MODE_PRIVATE);
+            if (preferences.contains(UI_DEGREES)) {
+                return;
             }
+            updateOrientation(degree);
         }
     }
+
+    private void updateOrientation(float degree) {
+        for (int i = 0; i < NUM_MARKERS; i++) {
+            rotateView(markers[i], currentDegrees[i], degree, initialDegrees[i]);
+            currentDegrees[i] = degree;
+        }
+    }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
