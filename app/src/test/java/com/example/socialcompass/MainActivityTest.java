@@ -2,7 +2,6 @@ package com.example.socialcompass;
 
 
 import static android.content.Context.MODE_PRIVATE;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,7 +10,11 @@ import org.robolectric.RobolectricTestRunner;
 import static org.junit.Assert.*;
 import android.content.SharedPreferences;
 import android.hardware.SensorEvent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,6 +25,7 @@ import androidx.test.rule.GrantPermissionRule;
 
 @RunWith(RobolectricTestRunner.class)
 public class MainActivityTest {
+
     private ActivityScenario<MainActivity> scenario;
 
     @Rule
@@ -120,6 +124,26 @@ public class MainActivityTest {
             editor.apply();
             activity.setMarkerAngles(locationService);
             assertEquals(270f, layoutParams.circleAngle, 0);
+        });
+    }
+
+    @Test
+    public void testFamilyIconMovesWithUserLocation() {
+        scenario.onActivity(activity -> {
+            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            MockLocationService locationService = new MockLocationService(activity);
+            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
+            locationService.setLocation(30, 0);
+            editor.putFloat("familyLatitude", 0);
+            editor.putFloat("familyLongitude", 0);
+            editor.apply();
+            activity.setMarkerAngles(locationService);
+            assertEquals(180, layoutParams.circleAngle, 0);
+            locationService.setLocation(0, -30);
+            activity.setMarkerAngles(locationService);
+            assertEquals(90, layoutParams.circleAngle, 0);
         });
     }
 }
