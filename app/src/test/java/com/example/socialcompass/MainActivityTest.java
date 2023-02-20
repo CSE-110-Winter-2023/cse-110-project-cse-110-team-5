@@ -10,7 +10,11 @@ import org.robolectric.RobolectricTestRunner;
 import static org.junit.Assert.*;
 import android.content.SharedPreferences;
 import android.hardware.SensorEvent;
+import android.location.Location;
+import android.location.LocationManager;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -120,6 +124,35 @@ public class MainActivityTest {
             editor.apply();
             activity.setMarkerAngles(locationService);
             assertEquals(270f, layoutParams.circleAngle, 0);
+        });
+    }
+
+    @Test
+    public void testFamilyIconMovesWithUserLocation() {
+        scenario.onActivity(activity -> {
+            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+
+            MockLocationService locationService = new MockLocationService(activity);
+            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
+            editor.putFloat("familyLatitude", 30f);
+            editor.putFloat("familyLongitude", 0f);
+            editor.apply();
+            activity.setMarkerAngles(locationService);
+            float initialX = family.getX();
+            float initialY = family.getY();
+            System.out.println(layoutParams.circleAngle);
+            locationService.setLocation(100, 100);
+
+            /**
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
+            editor.putFloat("familyLatitude", 30f);
+            editor.putFloat("familyLongitude", 0f);
+            editor.apply();
+            activity.setMarkerAngles(locationService);
+            System.out.println(family.getX());
+             **/
         });
     }
 }
