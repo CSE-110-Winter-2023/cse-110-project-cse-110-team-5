@@ -6,6 +6,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+/**
+ * This class controls what is done on the location entry screen of the app. It includes
+ * selection texts for the locations (longitude and latitude) for the user, their
+ * family, and their friends.
+ */
 public class LocationEntryActivity extends AppCompatActivity {
     // shared preferences data keys :)
     public static final String FAMILY_LONGITUDE = "familyLongitude";
@@ -36,6 +41,9 @@ public class LocationEntryActivity extends AppCompatActivity {
 
     private EditText degrees;
 
+    /*
+    Creates all the View's when the screen is started, and keeps them as SharedPreferences
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +64,7 @@ public class LocationEntryActivity extends AppCompatActivity {
         degrees = findViewById(R.id.degreesEditText);
 
         SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
+        //sets the old preferences to their respective labels
 
         longitudeFriend.setText(Util.getFloatAsString(preferences, FRIEND_LONGITUDE));
         latitudeFriend.setText(Util.getFloatAsString(preferences, FRIEND_LATITUDE));
@@ -72,15 +81,24 @@ public class LocationEntryActivity extends AppCompatActivity {
         degrees.setText(Util.getFloatAsString(preferences, UI_DEGREES));
     }
 
+    /*
+    Saves preferences when the back button is clicked.
+     */
     public void onBackButtonClick(View view) {
         savePreferences();
         finish(); // back to main activity
     }
 
+    /*
+    Saves preferences when the save button is clicked.
+     */
     public void onSaveButtonClick(View view) {
         savePreferences();
     }
 
+    /*
+    Checks for the required inputs when the mock degrees button is clicked.
+     */
     public void onMockDegreesButtonClick(View view) {
         // parse float
         try {
@@ -104,6 +122,10 @@ public class LocationEntryActivity extends AppCompatActivity {
         finish();
     }
 
+    /*
+    Saves each input on the location entry screen, so when the screen is left
+    the inputs will save.
+     */
     void savePreferences() {
         SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -121,8 +143,6 @@ public class LocationEntryActivity extends AppCompatActivity {
         Util.saveFloat(editor, longitudeYou, YOU_LONGITUDE);
         Util.saveFloat(editor, latitudeYou, YOU_LATITUDE);
         editor.putString(YOU_LABEL, labelYou.getText().toString());
-
-        //Util.saveFloat(editor, degrees, UI_DEGREES);
 
         editor.apply();
     }
