@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // SharedPreferences keys
     private static final String [] FAMILY_KEYS = {"familyLatitude", "familyLongitude", "familyLabel", "Parents"};
     private static final String [][] KEYS = {{}, FAMILY_KEYS};
+    private static final String NAME_KEY = "name";
+    private static final String UID_KEY = "uid";
 
     // Instance variables
     private LocationService locationService;
@@ -149,6 +151,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
         markers[0] = findViewById(R.id.arrow);
         markers[1] = findViewById(R.id.familyHouse);
+
+        String name = preferences.getString(NAME_KEY, null);
+        if (name == null) {
+            
+        }
 
         // Set permissions if not already set
         setPermissions();
