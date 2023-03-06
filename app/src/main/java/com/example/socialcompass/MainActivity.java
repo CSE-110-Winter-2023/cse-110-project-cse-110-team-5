@@ -26,6 +26,8 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.TextView;
 
+import java.util.UUID;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     // Constants
     private static final int NUM_MARKERS = 2;
@@ -152,11 +154,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markers[0] = findViewById(R.id.arrow);
         markers[1] = findViewById(R.id.familyHouse);
 
+        // check if name has been saved
         String name = preferences.getString(NAME_KEY, null);
         if (name == null) {
             SharedPreferences.Editor editor = preferences.edit();
-            Util.showNamePrompt(this, this, editor);
-            System.out.println(preferences.getString(NAME_KEY, null));
+            Util.showNamePrompt(this, this, editor); // prompt to enter name
+
+            // generate unique ID
+            String uniqueID = UUID.randomUUID().toString();
+            SharedPreferences.Editor editorUID = preferences.edit();
+            editorUID.putString(UID_KEY, uniqueID);
+            editorUID.apply();
+
+            // pop up to show the UID
+            
         }
 
         // Set permissions if not already set
