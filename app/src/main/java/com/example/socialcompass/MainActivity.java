@@ -154,7 +154,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         String name = preferences.getString(NAME_KEY, null);
         if (name == null) {
-            Util.showNamePrompt(this, this);
+            SharedPreferences.Editor editor = preferences.edit();
+            Util.showNamePrompt(this, this, editor);
+            System.out.println(preferences.getString(NAME_KEY, null));
         }
 
         // Set permissions if not already set

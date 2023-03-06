@@ -5,7 +5,9 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 /**
  * Util class in order to save each float in the activities.
@@ -42,19 +44,31 @@ public final class Util {
         }
     }
 
-    public static void showNamePrompt(Activity activity, Context context) {
+    public static void showNamePrompt(Activity activity, Context context, SharedPreferences.Editor editor) {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
         final EditText enter_name = new EditText(context);
         alertBuilder.setView(enter_name);
 
         alertBuilder
                 .setTitle("Enter Name")
-                .setPositiveButton("Save", (dialog, id) -> {
-                    dialog.cancel();
-                })
+                .setPositiveButton("Save", null)
                 .setCancelable(true);
 
         AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.setOnShowListener(dialog -> {
+            Button saveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            saveButton.setOnClickListener(view -> {
+                String name = enter_name.getText().toString().trim();
+                if (name.isEmpty()) {
+                    Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show();
+                    //saveButton.setEnabled(false);
+                } else {
+                    editor.putString("name", enter_name.getText().toString());
+                    editor.apply();
+                    alertDialog.dismiss();
+                }
+            });
+        });
         alertDialog.show();
     }
 }
