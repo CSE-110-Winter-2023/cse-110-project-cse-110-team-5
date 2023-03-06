@@ -12,7 +12,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import java.util.List;
 import java.util.concurrent.Executors;
 
-@Database(entities = {Location.class}, version = 1)
+@Database(entities = {Location.class}, version = 1, exportSchema = false)
 public abstract class LocationDatabase extends RoomDatabase {
     private static LocationDatabase singleton = null;
     public abstract LocationDao locationDao();

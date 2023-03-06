@@ -7,7 +7,6 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
-import androidx.room.Upsert;
 
 import java.util.List;
 
@@ -15,10 +14,13 @@ import java.util.List;
 public interface LocationDao {
 
     @Delete
-    public void deleteLocation(Location location);
+    public int deleteLocation(Location location);
 
-    @Upsert
-    public void upsertLocation(Location location);
+    @Update
+    public int updateLocation(Location location);
+
+    @Insert
+    public long insertLocation(Location location);
 
     // if we store our own location in the database,
     // we will need to ignore it. this can be done
