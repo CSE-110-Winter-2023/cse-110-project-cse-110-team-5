@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.util.UUID;
+
 /**
  * Util class in order to save each float in the activities.
  * Also parses floats into strings as necessary.
@@ -64,10 +66,15 @@ public final class Util {
                     //saveButton.setEnabled(false);
                 } else {
                     editor.putString("name", enter_name.getText().toString());
-                    editor.apply();
                     alertDialog.dismiss();
                 }
             });
+        });
+        alertDialog.setOnDismissListener(dialog -> {
+            String uniqueID = UUID.randomUUID().toString();
+            editor.putString("uid", uniqueID);
+            editor.apply();
+            showUID(activity, uniqueID);
         });
         alertDialog.show();
     }
