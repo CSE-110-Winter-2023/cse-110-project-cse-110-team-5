@@ -50,19 +50,19 @@ public class LocationBuilder {
         return this;
     }
 
-    /* will delete later; just here as a template to copy and paste :O
-    public Location copyLocation(Location location) {
-        return this.setPublicCode(location.publicCode)
+    // can use to copy a location and later edit only a small number of fields
+    // might not be necessary because location fields will stay public...
+    // i forgot why i wrote this ... >:(
+    public static LocationBuilder copyLocationData(Location location) {
+        return new LocationBuilder().setPublicCode(location.publicCode)
                 .setPrivateCode(location.privateCode)
                 .setLabel(location.label)
                 .setLatitude(location.latitude)
                 .setLongitude(location.longitude)
                 .setListedPublicly(location.listedPublicly)
                 .setCreatedAt(location.createdAt)
-                .setUpdatedAt(location.updatedAt)
-                .build();
+                .setUpdatedAt(location.updatedAt);
     }
-     */
 
     public Location build() {
         return new Location(publicCode, privateCode, label, latitude, longitude, listedPublicly, createdAt, updatedAt);
