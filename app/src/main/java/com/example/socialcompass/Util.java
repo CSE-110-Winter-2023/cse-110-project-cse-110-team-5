@@ -42,7 +42,7 @@ public final class Util {
         }
     }
 
-    public void showNamePrompt(Activity activity, Context context) {
+    public static void showNamePrompt(Activity activity, Context context) {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
         final EditText enter_name = new EditText(context);
         alertBuilder.setView(enter_name);

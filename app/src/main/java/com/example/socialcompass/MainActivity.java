@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         String name = preferences.getString(NAME_KEY, null);
         if (name == null) {
-            
+            Util.showNamePrompt(this, this);
         }
 
         // Set permissions if not already set
