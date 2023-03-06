@@ -163,6 +163,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Set initial angles and labels for all markers
         setMarkerAngles(locationService);
         setMarkerLabels();
+
+
     }
 
     /**

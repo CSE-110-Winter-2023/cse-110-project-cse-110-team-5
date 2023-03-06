@@ -1,5 +1,8 @@
 package com.example.socialcompass;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.EditText;
@@ -37,5 +40,21 @@ public final class Util {
         } else {
             return "";
         }
+    }
+
+    public void showNamePrompt(Activity activity, Context context) {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
+        final EditText enter_name = new EditText(context);
+        alertBuilder.setView(enter_name);
+
+        alertBuilder
+                .setTitle("Enter Name")
+                .setPositiveButton("Save", (dialog, id) -> {
+                    dialog.cancel();
+                })
+                .setCancelable(true);
+
+        AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.show();
     }
 }
