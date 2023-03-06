@@ -159,16 +159,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (name == null) {
             SharedPreferences.Editor editor = preferences.edit();
             Util.showNamePrompt(this, this, editor); // prompt to enter name
+            // check if UID has been generated and saved
+            String uid = preferences.getString(NAME_KEY, null);
+            if (uid == null) {
+                // generate unique ID
+                String uniqueID = UUID.randomUUID().toString();
+                SharedPreferences.Editor editorUID = preferences.edit();
+                editorUID.putString(UID_KEY, uniqueID);
+                editorUID.apply();
 
-            // generate unique ID
-            String uniqueID = UUID.randomUUID().toString();
-            SharedPreferences.Editor editorUID = preferences.edit();
-            editorUID.putString(UID_KEY, uniqueID);
-            editorUID.apply();
-
-            // pop up to show the UID
-            
+                // pop up to show the UID
+                Util.showUID(this, uniqueID);
+            }
         }
+
+
+
 
         // Set permissions if not already set
         setPermissions();

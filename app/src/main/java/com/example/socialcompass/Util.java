@@ -72,5 +72,19 @@ public final class Util {
         alertDialog.show();
     }
 
+    public static void showUID(Activity activity, String uniqueID) {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
 
+        alertBuilder
+                .setTitle("Reminder!")
+                .setMessage("Your unique user ID is " + uniqueID +
+                        " make sure to share this with your friends so they can track you.")
+                .setPositiveButton("OK", (dialog, id) -> {
+                    dialog.cancel();
+                })
+                .setCancelable(true);
+
+        AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.show();
+    }
 }
