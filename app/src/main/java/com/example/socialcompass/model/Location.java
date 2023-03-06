@@ -10,12 +10,12 @@ import com.google.gson.Gson;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
-@Entity(tableName = "location_items")
+@Entity(tableName = "locations")
 public class Location {
 
     public Location(
             @NonNull String publicCode,
-            @NonNull String privateCode,
+            String privateCode,
             @NonNull String label,
             @NonNull float latitude,
             @NonNull float longitude,
@@ -39,10 +39,13 @@ public class Location {
     @SerializedName("public_code")
     public String publicCode;
 
-    @NonNull
+    // private key only applies to our location, not others.
+    // consequently, null for everyone but us ... may possibly
+    // get rid of completely depending on how we store our private_code
+    // (i.e. we just access the code through shared preferences)
     @SerializedName("private_code")
     @ColumnInfo(name = "private_code")
-    public String privateCode;
+    public String privateCode = null;
 
     @NonNull
     @SerializedName("label")
