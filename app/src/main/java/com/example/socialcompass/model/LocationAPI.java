@@ -89,7 +89,13 @@ public class LocationAPI {
         String publicCode = location.publicCode.replace(" ", "%20");
         var requestBody = RequestBody.create(
                 MediaType.parse("application/json"),
-                gson.toJson(Map.of()));
+                gson.toJson(Map.of(
+                        "private_code", location.privateCode,
+                        "label", location.label,
+                        "latitude", location.latitude,
+                        "longitude", location.longitude
+                ))
+        );
 
         var request = new Request.Builder()
                 .url(BASE_URL + LOCATION_ENDPOINT + publicCode)
