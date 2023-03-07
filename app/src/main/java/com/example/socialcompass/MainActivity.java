@@ -26,6 +26,8 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.TextView;
 
+import java.util.UUID;
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     // Constants
     private static final int NUM_MARKERS = 2;
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // SharedPreferences keys
     private static final String [] FAMILY_KEYS = {"familyLatitude", "familyLongitude", "familyLabel", "Parents"};
     private static final String [][] KEYS = {{}, FAMILY_KEYS};
+    private static final String NAME_KEY = "name";
+    private static final String UID_KEY = "uid";
 
     // Instance variables
     private LocationService locationService;
@@ -150,12 +154,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markers[0] = findViewById(R.id.arrow);
         markers[1] = findViewById(R.id.familyHouse);
 
+        // check if name has been saved
+        String name = preferences.getString(NAME_KEY, null);
+        if (name == null) {
+            SharedPreferences.Editor editor = preferences.edit();
+            Util.showNamePrompt(this, this, editor); // prompt to enter name
+        }
+
+
+
+
         // Set permissions if not already set
         setPermissions();
 
         // Set initial angles and labels for all markers
         setMarkerAngles(locationService);
         setMarkerLabels();
+
+
     }
 
     /**

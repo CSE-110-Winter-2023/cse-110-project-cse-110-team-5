@@ -1,8 +1,15 @@
 package com.example.socialcompass;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import java.util.UUID;
 
 /**
  * Util class in order to save each float in the activities.
@@ -37,5 +44,54 @@ public final class Util {
         } else {
             return "";
         }
+    }
+
+    public static void showNamePrompt(Activity activity, Context context, SharedPreferences.Editor editor) {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
+        final EditText enter_name = new EditText(context);
+        alertBuilder.setView(enter_name);
+
+        alertBuilder
+                .setTitle("Enter Name")
+                .setPositiveButton("Save", null)
+                .setCancelable(true);
+
+        AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.setOnShowListener(dialog -> {
+            Button saveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            saveButton.setOnClickListener(view -> {
+                String name = enter_name.getText().toString().trim();
+                if (name.isEmpty()) {
+                    Toast.makeText(context, "Please enter a name", Toast.LENGTH_SHORT).show();
+                    //saveButton.setEnabled(false);
+                } else {
+                    editor.putString("name", enter_name.getText().toString());
+                    alertDialog.dismiss();
+                }
+            });
+        });
+        alertDialog.setOnDismissListener(dialog -> {
+            String uniqueID = UUID.randomUUID().toString();
+            editor.putString("uid", uniqueID);
+            editor.apply();
+            showUID(activity, uniqueID);
+        });
+        alertDialog.show();
+    }
+
+    public static void showUID(Activity activity, String uniqueID) {
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
+
+        alertBuilder
+                .setTitle("Reminder!")
+                .setMessage("Your unique user ID is " + uniqueID +
+                        " make sure to share this with your friends so they can track you.")
+                .setPositiveButton("OK", (dialog, id) -> {
+                    dialog.cancel();
+                })
+                .setCancelable(true);
+
+        AlertDialog alertDialog = alertBuilder.create();
+        alertDialog.show();
     }
 }
