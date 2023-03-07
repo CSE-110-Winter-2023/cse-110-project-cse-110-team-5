@@ -146,4 +146,13 @@ public class MainActivityTest {
             assertEquals(90, layoutParams.circleAngle, 0);
         });
     }
+
+    @Test
+    public void testNoNameEntered() {
+        scenario.onActivity(activity -> {
+            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+            String name = preferences.getString("name", null);
+            assertNull(name);
+        });
+    }
 }
