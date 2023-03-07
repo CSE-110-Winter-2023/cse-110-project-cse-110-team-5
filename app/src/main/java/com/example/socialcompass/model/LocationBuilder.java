@@ -45,14 +45,13 @@ public class LocationBuilder {
         return this;
     }
 
-    public LocationBuilder setLongitude(float latitude) {
-        this.latitude = latitude;
+    public LocationBuilder setLongitude(float longitude) {
+        this.longitude = longitude;
         return this;
     }
 
     // can use to copy a location and later edit only a small number of fields
-    // might not be necessary because location fields will stay public...
-    // i forgot why i wrote this ... >:(
+    // useful for testing :)
     public static LocationBuilder copyLocationData(Location location) {
         return new LocationBuilder().setPublicCode(location.publicCode)
                 .setPrivateCode(location.privateCode)
@@ -68,5 +67,3 @@ public class LocationBuilder {
         return new Location(publicCode, privateCode, label, latitude, longitude, listedPublicly, createdAt, updatedAt);
     }
 }
-
-
