@@ -49,6 +49,7 @@ public final class Util {
     public static void showNamePrompt(Activity activity, Context context, SharedPreferences.Editor editor) {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(activity);
         final EditText enter_name = new EditText(context);
+        enter_name.setId(R.id.name_prompt);
         alertBuilder.setView(enter_name);
 
         alertBuilder
