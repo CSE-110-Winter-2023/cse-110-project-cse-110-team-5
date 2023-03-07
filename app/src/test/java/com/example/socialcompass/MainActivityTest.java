@@ -153,6 +153,8 @@ public class MainActivityTest {
             SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
             String name = preferences.getString("name", null);
             assertNull(name);
+            String uid = preferences.getString("uid", null);
+            assertNull(uid);
         });
     }
 }
