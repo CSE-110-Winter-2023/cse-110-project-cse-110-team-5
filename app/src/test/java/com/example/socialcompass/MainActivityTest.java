@@ -7,7 +7,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.shadows.ShadowAlertDialog;
+
 import static org.junit.Assert.*;
+
+import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.hardware.SensorEvent;
 import android.location.Location;
@@ -21,6 +25,7 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
 @RunWith(RobolectricTestRunner.class)
@@ -144,6 +149,26 @@ public class MainActivityTest {
             locationService.setLocation(0, -30);
             activity.setMarkerAngles(locationService);
             assertEquals(90, layoutParams.circleAngle, 0);
+        });
+    }
+
+    @Test
+    public void testNoNameEntered() {
+        scenario.onActivity(activity -> {
+            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+            String name = preferences.getString("name", null);
+            assertNull(name);
+            String uid = preferences.getString("uid", null);
+            assertNull(uid);
+        });
+    }
+
+    @Test
+    public void testAlertDisplayedWhenNoName() {
+        scenario.onActivity(activity -> {
+            //Haven't set a name, so popup should appear
+            AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+            assertNotNull(alertDialog);
         });
     }
 }
