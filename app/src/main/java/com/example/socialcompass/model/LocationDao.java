@@ -3,6 +3,7 @@ package com.example.socialcompass.model;
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
+import androidx.room.DeleteTable;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -34,6 +35,18 @@ public interface LocationDao {
 
     @Query("SELECT * FROM `locations` WHERE `public_code` = :publicCode")
     public Location getLocation(String publicCode);
+
+    @Query("SELECT * FROM `locations` WHERE `public_code` = :publicCode")
+    public LiveData<Location> getLocationLive(String publicCode);
+
+    @Query("SELECT EXISTS(SELECT 1 FROM `locations` WHERE `public_code` = :publicCode)")
+    public boolean exists(String publicCode);
+
+    @Query("DELETE FROM `locations`")
+    public void clear();
+
+    @Query("SELECT COUNT(*) from `locations`")
+    public int size();
 
     /*
     @Query("SELECT * FROM `locations` WHERE `public_code` = {our uuid goes here})

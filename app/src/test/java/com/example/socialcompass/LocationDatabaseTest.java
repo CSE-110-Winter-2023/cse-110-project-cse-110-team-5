@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import android.content.Context;
 
@@ -100,6 +101,44 @@ public class LocationDatabaseTest {
         updatedLocation = dao.getLocation(publicCode);
         assertNotNull(testLocation1);
         assertEquals(updatedLocation.label, "new_label");
+    }
+
+    @Test
+    public void testExists() {
+        long id = dao.insertLocation(testLocation1);
+
+        boolean itemFound = dao.exists(testLocation1.publicCode);
+        assertTrue(itemFound);
+
+        dao.deleteLocation(testLocation1);
+        boolean itemNotFound = dao.exists(testLocation1.publicCode);
+        assertTrue(!itemNotFound);
+    }
+
+    @Test
+    public void testClear() {
+        dao.insertLocation(testLocation1);
+        boolean itemFound = dao.exists(testLocation1.publicCode);
+        assertTrue(itemFound);
+
+        dao.clear();
+        boolean itemNotFound = dao.exists(testLocation1.publicCode);
+        assertTrue(!itemNotFound);
+
+        var stuff = dao.getAllLocations();
+        assertNotNull(stuff);
+        assertTrue(stuff.isEmpty());
+    }
+
+    @Test
+    public void testSize() {
+        dao.clear();
+        assertTrue(dao.size() == 0);
+
+        dao.insertLocation(testLocation1);
+        boolean itemFound = dao.exists(testLocation1.publicCode);
+        assertTrue(itemFound);
+        assertTrue(dao.size() == 1);
     }
 
     @Test
