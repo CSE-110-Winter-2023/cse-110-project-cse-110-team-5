@@ -5,7 +5,7 @@
  */
 package com.example.socialcompass;
 
-import static com.example.socialcompass.LocationEntryActivity.UI_DEGREES;
+import static com.example.socialcompass.AddFriendActivity.UI_DEGREES;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
@@ -174,15 +174,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
-    /**
-     * Behavior of Location button
-     * @param view: The ButtonView that triggered the method
-     */
-    public void onLocationsButtonClick(View view) {
-        Intent intent = new Intent(this, LocationEntryActivity.class);
+    public void onAddFriendButtonClick(View view) {
+        Intent intent = new Intent(this, AddFriendActivity.class);
         startActivity(intent);
     }
-
     /**
      * App behavior when resumed
      */

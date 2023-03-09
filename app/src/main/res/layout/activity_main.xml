@@ -41,14 +41,14 @@
         app:srcCompat="@drawable/arrow" />
 
     <Button
-        android:id="@+id/locationsButton"
+        android:id="@+id/addFriendButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="160dp"
         android:layout_marginEnd="157dp"
         android:layout_marginBottom="85dp"
-        android:onClick="onLocationsButtonClick"
-        android:text="@string/locations"
+        android:onClick="onAddFriendButtonClick"
+        android:text="@string/addFriend"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

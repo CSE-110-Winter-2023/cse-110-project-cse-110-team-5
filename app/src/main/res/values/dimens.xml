@@ -4,4 +4,5 @@
     <dimen name="LocationEntryViewHeight">45dp</dimen>
     <dimen name="LocationEntryButtonWidth">185dp</dimen>
     <dimen name="LocationEntryButtonHeight">45dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>
