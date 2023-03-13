@@ -81,31 +81,30 @@
 
     <TextView
         android:id="@+id/addFriendTextView"
-        android:layout_width="111dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="13dp"
-        android:layout_marginEnd="189dp"
-        android:layout_marginBottom="500dp"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
         android:text="Add Friend"
-        android:textSize="20sp"
+        android:textAlignment="center"
+        android:textSize="34sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.025"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.31" />
 
     <EditText
         android:id="@+id/addFriendEditText"
-        android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryViewHeight"
+        android:layout_width="383dp"
+        android:layout_height="52dp"
         android:ems="10"
-        android:hint="Degrees"
+        android:hint="Friend UUID goes here...."
         android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.072"
+        app:layout_constraintHorizontal_bias="0.571"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.433" />
+        app:layout_constraintVertical_bias="0.418" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
