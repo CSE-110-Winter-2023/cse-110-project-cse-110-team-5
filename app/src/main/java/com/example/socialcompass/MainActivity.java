@@ -26,6 +26,7 @@ import android.os.Bundle;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import com.example.socialcompass.model.Location;
+import com.example.socialcompass.model.LocationRepository;
 import com.example.socialcompass.viewmodel.MainActivityViewModel;
 import com.example.socialcompass.builders.MarkerBuilder;
 import java.util.List;
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Hashtable<String, Float> markerOffsets;
     private Hashtable<String, View> markers;
     private MainActivityViewModel viewModel;
+    private Location userLocation;
 
     private void addMarker(Location location) {
         MarkerBuilder builder = new MarkerBuilder(this);
@@ -129,26 +131,43 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markerDegrees = new Hashtable<String, Float>();
         markerOffsets = new Hashtable<String, Float>();
 
+
+
+        // View Model and Observers
+        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        Observer<List<Location>> locationsObserver = this::updateAngles;
+        viewModel.getLocations().observe(this, locationsObserver);
+
         // Set permissions if not already set
         setPermissions();
         locationService = LocationService.singleton(this);
-        locationService.getLocation().observe(this, location -> updateAngles(viewModel.getLocations().getValue()));
 
         // View initialization
         setContentView(R.layout.activity_main);
         // check if name has been saved
-        String name = preferences.getString(NAME_KEY, null);
-        if (name == null) {
+        String nameCheck = preferences.getString(NAME_KEY, null);
+        if (nameCheck == null) {
             SharedPreferences.Editor editor = preferences.edit();
             Util.showNamePrompt(this, this, editor); // prompt to enter name
         }
 
+
+        locationService.getLocation().observe(this, location -> {
+            String uid = preferences.getString(UID_KEY, null);
+            String name = preferences.getString(NAME_KEY, null);
+            if (name != null) {
+                updateAngles(viewModel.getLocations().getValue());
+                double latitude = location.first;
+                double longitude = location.second;
+                this.userLocation = new Location(uid, uid, name, (float) latitude, (float) longitude, false, 0, 0);
+                viewModel.pushLocation(this.userLocation);
+            }
+        });
         // -------------------------------------------------------------------------------------- //
         //                                     MS2 Stuff Below                                    //
         // -------------------------------------------------------------------------------------- //
 
         // assign viewModel to safely hold MainActivity state outside it's lifecycle
-        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
         // create an Observer which updates the UI whenever the list of locations changes
         // which should happen everytime we update our local database because
@@ -156,8 +175,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //
         // search up "Write asynchronous DAO queries" and "LiveData" and "ViewModel" if
         // you haven't already
-        Observer<List<Location>> locationsObserver = this::updateAngles;
-        viewModel.getLocations().observe(this, locationsObserver);
+
     }
 
     public void onAddFriendButtonClick(View view) {

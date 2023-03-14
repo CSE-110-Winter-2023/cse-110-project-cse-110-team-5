@@ -1,11 +1,6 @@
 package com.example.socialcompass.model;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -15,12 +10,14 @@ import java.util.concurrent.TimeUnit;
 public class LocationRepository {
     private LocationDao dao;
     private LocationAPI api;
-    private ScheduledExecutorService executor;
+    private ScheduledExecutorService getLocationExecutor;
+    private ScheduledExecutorService setLocationExecutor;
 
     public LocationRepository(LocationDao dao) {
         this.dao = dao;
         this.api = LocationAPI.provide();
-        executor = Executors.newSingleThreadScheduledExecutor();
+        getLocationExecutor = Executors.newSingleThreadScheduledExecutor();
+        setLocationExecutor = Executors.newSingleThreadScheduledExecutor();
     }
 
     // this returns what is known as an observable query
@@ -72,13 +69,17 @@ public class LocationRepository {
     }
 
     public void pollForUpdates() {
-        executor.scheduleAtFixedRate(() -> {
+        getLocationExecutor.scheduleAtFixedRate(() -> {
             List<Location> locationsInDatabase = dao.getAllLocations();
             for (Location location: locationsInDatabase) {
                 Location remoteLocation = getRemote(location.publicCode);
                 dao.updateLocation(remoteLocation);
             }
         }, 0, 3, TimeUnit.SECONDS);
+    }
+
+    public void pushUserLocation(Location location) {
+        api.putAsync(location);
     }
 
     public void clear() {
