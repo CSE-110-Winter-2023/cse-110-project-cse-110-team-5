@@ -7,7 +7,11 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.shadows.ShadowAlertDialog;
+
 import static org.junit.Assert.*;
+
+import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.hardware.SensorEvent;
 import android.location.Location;
@@ -21,6 +25,7 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
 
 @RunWith(RobolectricTestRunner.class)
@@ -62,88 +67,23 @@ public class MainActivityTest {
         });
     }
 
-//    @Test
-//    public void testIfFamilyDisplayed() {
-//        scenario.onActivity(activity -> {
-//            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
-//            SharedPreferences.Editor editor = preferences.edit();
-//            editor.putFloat("familyLatitude", 30f);
-//            editor.putFloat("familyLongitude", -120f);
-//            editor.apply();
-//            MockLocationService locationService = new MockLocationService(activity);
-//            activity.setMarkerAngles(locationService);
-//            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
-//            assertTrue(family.isShown());
-//        });
-//    }
-//
-//    @Test
-//    public void testFamilyNotDisplayed() {
-//        scenario.onActivity(activity -> {
-//            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
-//            SharedPreferences.Editor editor = preferences.edit();
-//            if (preferences.contains("familyLatitude")) {
-//                editor.remove("familyLatitude");
-//            }
-//            if (preferences.contains("familyLongitude")) {
-//                editor.remove("familyLongitude");
-//            }
-//            editor.apply();
-//            MockLocationService locationService = new MockLocationService(activity);
-//            activity.setMarkerAngles(locationService);
-//            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
-//            assertFalse(family.isShown());
-//        });
-//    }
-//
-//    @Test
-//    public void testFamilyAngle() {
-//        scenario.onActivity(activity -> {
-//            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
-//            SharedPreferences.Editor editor = preferences.edit();
-//            MockLocationService locationService = new MockLocationService(activity);
-//            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
-//            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
-//            editor.putFloat("familyLatitude", 30f);
-//            editor.putFloat("familyLongitude", 0f);
-//            editor.apply();
-//            activity.setMarkerAngles(locationService);
-//            assertEquals(0f, layoutParams.circleAngle, 0);
-//            editor.putFloat("familyLatitude", 0f);
-//            editor.putFloat("familyLongitude", 30f);
-//            editor.apply();
-//            activity.setMarkerAngles(locationService);
-//            assertEquals(90f, layoutParams.circleAngle, 0);
-//            editor.putFloat("familyLatitude", -30f);
-//            editor.putFloat("familyLongitude", 0f);
-//            editor.apply();
-//            activity.setMarkerAngles(locationService);
-//            assertEquals(180f, layoutParams.circleAngle, 0);
-//            editor.putFloat("familyLatitude", 0f);
-//            editor.putFloat("familyLongitude", -30f);
-//            editor.apply();
-//            activity.setMarkerAngles(locationService);
-//            assertEquals(270f, layoutParams.circleAngle, 0);
-//        });
-//    }
-//
-//    @Test
-//    public void testFamilyIconMovesWithUserLocation() {
-//        scenario.onActivity(activity -> {
-//            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
-//            SharedPreferences.Editor editor = preferences.edit();
-//            MockLocationService locationService = new MockLocationService(activity);
-//            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
-//            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
-//            locationService.setLocation(30, 0);
-//            editor.putFloat("familyLatitude", 0);
-//            editor.putFloat("familyLongitude", 0);
-//            editor.apply();
-//            activity.setMarkerAngles(locationService);
-//            assertEquals(180, layoutParams.circleAngle, 0);
-//            locationService.setLocation(0, -30);
-//            activity.setMarkerAngles(locationService);
-//            assertEquals(90, layoutParams.circleAngle, 0);
-//        });
-//    }
+    @Test
+    public void testNoNameEntered() {
+        scenario.onActivity(activity -> {
+            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+            String name = preferences.getString("name", null);
+            assertNull(name);
+            String uid = preferences.getString("uid", null);
+            assertNull(uid);
+        });
+    }
+
+    @Test
+    public void testAlertDisplayedWhenNoName() {
+        scenario.onActivity(activity -> {
+            //Haven't set a name, so popup should appear
+            AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
+            assertNotNull(alertDialog);
+        });
+    }
 }

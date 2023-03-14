@@ -67,3 +67,4 @@ public class LocationBuilder {
         return new Location(publicCode, privateCode, label, latitude, longitude, listedPublicly, createdAt, updatedAt);
     }
 }
+

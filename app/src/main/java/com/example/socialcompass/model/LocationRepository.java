@@ -1,5 +1,7 @@
 package com.example.socialcompass.model;
 
+import android.util.Log;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -12,12 +14,12 @@ import java.util.concurrent.TimeUnit;
 
 public class LocationRepository {
     private LocationDao dao;
-    //private LocationAPI api;
+    private LocationAPI api;
     private ScheduledExecutorService executor;
 
     public LocationRepository(LocationDao dao) {
         this.dao = dao;
-        //this.api = LocationAPI.provide();
+        this.api = LocationAPI.provide();
         executor = Executors.newSingleThreadScheduledExecutor();
     }
 
@@ -31,26 +33,42 @@ public class LocationRepository {
         return dao.getAllLocationsLive();
     }
 
+    /**
+     *  Searches for location object in remote server and returns it as
+     *  a location object. Return null if not found.
+     *
+     * @param publicCode code of friend your searching for
+     * @return location if friend with code exists or null otherwise
+     */
     public Location getRemote(String publicCode) {
-        /* need api here
         Location location = null;
-        var pair = api.getLocation(publicCode) // or something like this
-        if (pair.first == Location.SUCCESS_CODE) {
-           location = Location.fromJson(pair.second); // or something like this; check in Locations.java plz
+        var future = api.getAsync(publicCode);
+        try {
+            var pair = future.get();
+            if (pair != null && pair.first == LocationAPI.SUCCESS_CODE) {
+                return Location.fromJSON(pair.second);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return location;
-        */
-        return null;
     }
 
-    public void addLocation(Location location) {
+    public void addLocationToDb(Location location) {
         // this will automatically update the live data object
         // in main and call the ui change
-        // dao.insertLocation(location) // check
+        if (!dao.exists(location.publicCode))
+            dao.insertLocation(location);
     }
 
-    public void updateRemote(Location location) {
-        // api.updateLocationCoordinates(location) // check
+    public void updateLocationInDb(Location location) {
+        // this will automatically update the live data object
+        // in main and call the ui change
+        dao.updateLocation(location);
+    }
+
+    public void updateRemote(Location ourlocation) {
+        api.updateCoordinates(ourlocation);
     }
 
     public void pollForUpdates() {
@@ -61,5 +79,9 @@ public class LocationRepository {
                 dao.updateLocation(remoteLocation);
             }
         }, 0, 3, TimeUnit.SECONDS);
+    }
+
+    public void clear() {
+        dao.clear();
     }
 }

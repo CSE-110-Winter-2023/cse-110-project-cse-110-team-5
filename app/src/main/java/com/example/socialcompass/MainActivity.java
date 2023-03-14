@@ -5,19 +5,17 @@
  */
 package com.example.socialcompass;
 
-import static com.example.socialcompass.LocationEntryActivity.UI_DEGREES;
+import static com.example.socialcompass.AddFriendActivity.UI_DEGREES;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.hardware.Sensor;
@@ -25,17 +23,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.view.animation.RotateAnimation;
 import android.widget.TextView;
-
 import com.example.socialcompass.model.Location;
 import com.example.socialcompass.viewmodel.MainActivityViewModel;
 import com.example.socialcompass.builders.MarkerBuilder;
-
 import java.util.List;
 import java.util.Hashtable;
+import java.util.UUID;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -148,7 +143,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             Util.showNamePrompt(this, this, editor); // prompt to enter name
         }
 
-
         // -------------------------------------------------------------------------------------- //
         //                                     MS2 Stuff Below                                    //
         // -------------------------------------------------------------------------------------- //
@@ -166,15 +160,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         viewModel.getLocations().observe(this, locationsObserver);
     }
 
-    /**
-     * Behavior of Location button
-     * @param view: The ButtonView that triggered the method
-     */
-    public void onLocationsButtonClick(View view) {
-        Intent intent = new Intent(this, LocationEntryActivity.class);
+    public void onAddFriendButtonClick(View view) {
+        Intent intent = new Intent(this, AddFriendActivity.class);
         startActivity(intent);
     }
-
     /**
      * App behavior when resumed
      */
