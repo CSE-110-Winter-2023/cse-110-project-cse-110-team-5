@@ -16,6 +16,7 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.renderscript.Sampler;
 import android.util.Pair;
 import android.view.View;
 import android.hardware.Sensor;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // Constants
     private static final int NO_LOCATION = -1;
     private static final int ANIMATION_DURATION = 210;
+    private static final int MAX_CIRCLE_RADIUS = 543;
 
     // SharedPreferences keys
     private static final String NAME_KEY = "name";
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Hashtable<String, View> markers;
     private MainActivityViewModel viewModel;
     private Location userLocation;
+    private int zoomScale;
 
     private void addMarker(Location location) {
         MarkerBuilder builder = new MarkerBuilder(this);
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             double distance = calculateDistance(latitude, longitude);
             if (distance != NO_LOCATION) {
                 markerDistances.replace(key, (float)distance);
+                setMarkerDistance(markers.get(key), distance);
             }
     }
 
@@ -160,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markerDegrees = new Hashtable<String, Float>();
         markerOffsets = new Hashtable<String, Float>();
         markerDistances = new Hashtable<String, Float>();
+        zoomScale = 10;
 
 
         // View Model and Observers
@@ -234,15 +239,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param view: The view to rotate
      * @param startAngle: The current angle of the view
      * @param endAngle: The ending angle of the view
-     * @param initialDegree: The angle of the coordinates of the view with respect to 0 degrees
+     * @param degreeOffset: The angle of the coordinates of the view with respect to 0 degrees
      */
-    private void rotateView(View view, float startAngle, float endAngle, float initialDegree) {
+    private void rotateView(View view, float startAngle, float endAngle, float degreeOffset) {
         // Change circle constraint angle
         ValueAnimator anim = ValueAnimator.ofFloat(startAngle, endAngle);
         anim.addUpdateListener(valueAnimator -> {
             float val = (Float) valueAnimator.getAnimatedValue();
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
-            layoutParams.circleAngle = val + initialDegree;
+            layoutParams.circleAngle = val + degreeOffset;
+            view.setLayoutParams(layoutParams);
+        });
+        anim.setDuration(ANIMATION_DURATION);
+        anim.setInterpolator(new LinearInterpolator());
+        anim.start();
+    }
+
+    private void setMarkerDistance(View view, double distance) {
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)view.getLayoutParams();
+        int initialRadius = layoutParams.circleRadius;
+        int finalRadius = (int)((distance / this.zoomScale) * MAX_CIRCLE_RADIUS);
+        ValueAnimator anim = ValueAnimator.ofInt(initialRadius, finalRadius);
+        anim.addUpdateListener(valueAnimator -> {
+            int val = (Integer) valueAnimator.getAnimatedValue();
+            layoutParams.circleRadius = val;
             view.setLayoutParams(layoutParams);
         });
         anim.setDuration(ANIMATION_DURATION);
