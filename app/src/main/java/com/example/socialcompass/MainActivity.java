@@ -129,8 +129,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         double angle = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(Math.toRadians(devLatitude)) *
                 Math.cos(Math.toRadians(latitude)) * Math.sin(dLon/2) * Math.sin(dLon/2);
         double c = 2 * Math.atan2(Math.sqrt(angle), Math.sqrt(1-angle));
-        double distance = R * c; // Distance in mi
-        return distance;
+        return R * c; // Distance in mi
     }
 
     /**
