@@ -43,7 +43,7 @@ public class LocationDatabaseTest {
     @Before
     public void CreateLocation() {
         testLocation1 = new LocationBuilder()
-                .setPublicCode("public_code")
+                .setPublicCode("public_code2")
                 .setPrivateCode("private_code")
                 .setLabel("label")
                 .setLatitude(101)
@@ -63,7 +63,7 @@ public class LocationDatabaseTest {
     public void testInsert() {
         Location testLocation2 = LocationBuilder
                 .copyLocationData(testLocation1)
-                .setPublicCode("public_code_2")
+                .setPublicCode("public_code_3")
                 .build();
 
         long id1 = dao.insertLocation(testLocation1);

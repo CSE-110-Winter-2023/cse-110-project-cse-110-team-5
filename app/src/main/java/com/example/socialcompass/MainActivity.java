@@ -17,6 +17,7 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.hardware.Sensor;
@@ -28,20 +29,20 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.TextView;
-import java.util.UUID;
+
 import com.example.socialcompass.model.Location;
 import com.example.socialcompass.viewmodel.MainActivityViewModel;
+import com.example.socialcompass.builders.MarkerBuilder;
+
 import java.util.List;
+import java.util.Hashtable;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     // Constants
-    private static final int NUM_MARKERS = 2;
     private static final int NO_LOCATION = -1;
     private static final int ANIMATION_DURATION = 210;
 
     // SharedPreferences keys
-    private static final String [] FAMILY_KEYS = {"familyLatitude", "familyLongitude", "familyLabel", "Parents"};
-    private static final String [][] KEYS = {{}, FAMILY_KEYS};
     private static final String NAME_KEY = "name";
     private static final String UID_KEY = "uid";
 
@@ -50,69 +51,49 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
     private Sensor magneticFieldSensor;
     private SharedPreferences preferences;
-    private float [] currentDegrees;
-    private float [] initialDegrees;
-    private View [] markers;
-
+    private Hashtable<String, Float> markerDegrees;
+    private Hashtable<String, Float> markerOffsets;
+    private Hashtable<String, View> markers;
     private MainActivityViewModel viewModel;
 
-    /**
-     * Sets the angles of all the markers according to their coordinates and the device orientation
-     * @param locationService: the LocationService of the device, or a mock object
-     */
-    protected void setMarkerAngles(LocationService locationService) {
-        for (int i = 1; i < NUM_MARKERS; i++) {
-            String latKey = KEYS[i][0];
-            String longKey = KEYS[i][1];
-            if (preferences.contains(latKey) && preferences.contains(longKey)) {
-                double markerLongitude = Double.parseDouble(Util.getFloatAsString(preferences, longKey));
-                double markerLatitude = Double.parseDouble(Util.getFloatAsString(preferences, latKey));
-                double angle = calculateAngle(locationService, markerLatitude, markerLongitude);
-                if (angle == NO_LOCATION) {
-                    markers[i].setVisibility(View.GONE);
-                }
-                else {
-                    initialDegrees[i] = (float)angle;
-                    rotateView(markers[i], currentDegrees[i], currentDegrees[i], initialDegrees[i]);
-                    markers[i].setVisibility(View.VISIBLE);
-                }
-            }
-            else {
-                markers[i].setVisibility(View.GONE);
-            }
-        }
+
+    private void addMarker(Location location) {
+        MarkerBuilder builder = new MarkerBuilder(this);
+        TextView marker = builder.setText(location.label).getNewMarker();
+        markers.put(location.publicCode, marker);
+        markerDegrees.put(location.publicCode, 0f);
+        markerOffsets.put(location.publicCode, 0f);
     }
 
-    /**
-     * Sets the labels of each marker according to the entry in LocationEntryActivity
-     */
-    protected void setMarkerLabels() {
-        for (int i = 1; i < NUM_MARKERS; i++) {
-            String labelKey = KEYS[i][2];
-            if (preferences.contains(labelKey)) {
-                String label = preferences.getString(labelKey, null);
-                if (label == null || label.equals("")) {
-                    ((TextView) markers[i]).setText(KEYS[i][3]);
-                    continue;
-                }
-                ((TextView) markers[i]).setText(label);
-            }
+    protected void updateAngles(List<Location> locations) {
+        if (locations == null) {
+            return;
         }
-        if (preferences.contains(UI_DEGREES)) {
-            float orientation = preferences.getFloat(UI_DEGREES, 0f);
-            updateOrientation(orientation);
+        for (int i = 0; i < locations.size(); i++) {
+            Location currLocation = locations.get(i);
+            String key = currLocation.publicCode;
+            if (!markers.containsKey(key)) {
+                addMarker(currLocation);
+            }
+            double latitude = currLocation.latitude;
+            double longitude = currLocation.longitude;
+            double angle = calculateAngle(latitude, longitude);
+            if (angle != NO_LOCATION) {
+                markerOffsets.replace(key, (float)angle);
+                rotateView(markers.get(key), markerDegrees.get(key), markerDegrees.get(key), markerOffsets.get(key));
+                markers.get(key).setVisibility(View.VISIBLE);
+            }
         }
     }
 
     /**
      * Calculates the angle between the device and a given set of coordinates
-     * @param locationService: The LocationService for the device, or a mock object
      * @param latitude: The latitude of the target coordinates
      * @param longitude: The longitude of the target coordinates
      * @return The angle between the device and the target coordinates as a double
      */
-    protected double calculateAngle(LocationService locationService, double latitude, double longitude) {
-        Pair<Double, Double> location = locationService.getLocation().getValue();
+    protected double calculateAngle(double latitude, double longitude) {
+        Pair<Double, Double> location = this.locationService.getLocation().getValue();
         if (location != null) {
             double devLatitude = Math.toRadians(location.first);
             latitude = Math.toRadians(latitude);
@@ -143,23 +124,23 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // MainActivityBuilder mainBuilder = new MainActivityBuilder(this);
 
         // Instance variable initialization
         preferences = getSharedPreferences("shared", MODE_PRIVATE);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        currentDegrees = new float[NUM_MARKERS];
-        initialDegrees = new float[NUM_MARKERS];
-        markers = new View[NUM_MARKERS];
+        markers = new Hashtable<String, View>();
+        markerDegrees = new Hashtable<String, Float>();
+        markerOffsets = new Hashtable<String, Float>();
+
         // Set permissions if not already set
         setPermissions();
         locationService = LocationService.singleton(this);
-        locationService.getLocation().observe(this, location -> setMarkerAngles(locationService));
+        locationService.getLocation().observe(this, location -> updateAngles(viewModel.getLocations().getValue()));
 
         // View initialization
         setContentView(R.layout.activity_main);
-        markers[0] = findViewById(R.id.arrow);
-        markers[1] = findViewById(R.id.familyHouse);
 
         // check if name has been saved
         String name = preferences.getString(NAME_KEY, null);
@@ -167,13 +148,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             SharedPreferences.Editor editor = preferences.edit();
             Util.showNamePrompt(this, this, editor); // prompt to enter name
         }
-
-        // Set permissions if not already set
-        setPermissions();
-
-        // Set initial angles and labels for all markers
-        setMarkerAngles(locationService);
-        setMarkerLabels();
 
         // -------------------------------------------------------------------------------------- //
         //                                     MS2 Stuff Below                                    //
@@ -188,13 +162,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //
         // search up "Write asynchronous DAO queries" and "LiveData" and "ViewModel" if
         // you haven't already
-        Observer<List<Location>> locationsObserver = new Observer<List<Location>>() {
-            @Override
-            public void onChanged(List<Location> locations) {
-                // update the UI here using the new modified list of
-                // locations
-            }
-        };
+        Observer<List<Location>> locationsObserver = this::updateAngles;
         viewModel.getLocations().observe(this, locationsObserver);
     }
 
@@ -214,10 +182,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     protected void onResume(){
         super.onResume();
         sensorManager.registerListener(this, magneticFieldSensor, SensorManager.SENSOR_DELAY_NORMAL);
-
-        // Set all markers
-        setMarkerAngles(locationService);
-        setMarkerLabels();
     }
 
     /**
@@ -247,17 +211,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         });
         anim.setDuration(ANIMATION_DURATION);
         anim.setInterpolator(new LinearInterpolator());
-        // Change marker orientation
-        RotateAnimation ra = new RotateAnimation(
-                startAngle,
-                endAngle,
-                Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f
-        );
-        ra.setDuration(ANIMATION_DURATION);
-        ra.setFillAfter(true);
         anim.start();
-        view.startAnimation(ra);
     }
 
     /**
@@ -269,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             float degree = (float) Math.toDegrees(Math.atan2(sensorEvent.values[0], sensorEvent.values[1]));
             // check if ui mock is on
-            var preferences = getSharedPreferences("shared", MODE_PRIVATE);
             if (preferences.contains(UI_DEGREES)) {
                 return;
             }
@@ -282,10 +235,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param degree: how much to rotate each marker
      */
     private void updateOrientation(float degree) {
-        for (int i = 0; i < NUM_MARKERS; i++) {
-            rotateView(markers[i], currentDegrees[i], degree, initialDegrees[i]);
-            currentDegrees[i] = degree;
+        if (markers.size() == 0) {
+            return;
         }
+        markers.forEach((k, v) -> {
+            rotateView(v, markerDegrees.get(k), degree, markerOffsets.get(k));
+            markerDegrees.replace(k, degree);
+        });
     }
 
     /**

@@ -62,88 +62,88 @@ public class MainActivityTest {
         });
     }
 
-    @Test
-    public void testIfFamilyDisplayed() {
-        scenario.onActivity(activity -> {
-            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putFloat("familyLatitude", 30f);
-            editor.putFloat("familyLongitude", -120f);
-            editor.apply();
-            MockLocationService locationService = new MockLocationService(activity);
-            activity.setMarkerAngles(locationService);
-            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
-            assertTrue(family.isShown());
-        });
-    }
-
-    @Test
-    public void testFamilyNotDisplayed() {
-        scenario.onActivity(activity -> {
-            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            if (preferences.contains("familyLatitude")) {
-                editor.remove("familyLatitude");
-            }
-            if (preferences.contains("familyLongitude")) {
-                editor.remove("familyLongitude");
-            }
-            editor.apply();
-            MockLocationService locationService = new MockLocationService(activity);
-            activity.setMarkerAngles(locationService);
-            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
-            assertFalse(family.isShown());
-        });
-    }
-
-    @Test
-    public void testFamilyAngle() {
-        scenario.onActivity(activity -> {
-            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            MockLocationService locationService = new MockLocationService(activity);
-            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
-            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
-            editor.putFloat("familyLatitude", 30f);
-            editor.putFloat("familyLongitude", 0f);
-            editor.apply();
-            activity.setMarkerAngles(locationService);
-            assertEquals(0f, layoutParams.circleAngle, 0);
-            editor.putFloat("familyLatitude", 0f);
-            editor.putFloat("familyLongitude", 30f);
-            editor.apply();
-            activity.setMarkerAngles(locationService);
-            assertEquals(90f, layoutParams.circleAngle, 0);
-            editor.putFloat("familyLatitude", -30f);
-            editor.putFloat("familyLongitude", 0f);
-            editor.apply();
-            activity.setMarkerAngles(locationService);
-            assertEquals(180f, layoutParams.circleAngle, 0);
-            editor.putFloat("familyLatitude", 0f);
-            editor.putFloat("familyLongitude", -30f);
-            editor.apply();
-            activity.setMarkerAngles(locationService);
-            assertEquals(270f, layoutParams.circleAngle, 0);
-        });
-    }
-
-    @Test
-    public void testFamilyIconMovesWithUserLocation() {
-        scenario.onActivity(activity -> {
-            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            MockLocationService locationService = new MockLocationService(activity);
-            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
-            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
-            locationService.setLocation(30, 0);
-            editor.putFloat("familyLatitude", 0);
-            editor.putFloat("familyLongitude", 0);
-            editor.apply();
-            activity.setMarkerAngles(locationService);
-            assertEquals(180, layoutParams.circleAngle, 0);
-            locationService.setLocation(0, -30);
-            activity.setMarkerAngles(locationService);
-            assertEquals(90, layoutParams.circleAngle, 0);
-        });
-    }
+//    @Test
+//    public void testIfFamilyDisplayed() {
+//        scenario.onActivity(activity -> {
+//            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+//            SharedPreferences.Editor editor = preferences.edit();
+//            editor.putFloat("familyLatitude", 30f);
+//            editor.putFloat("familyLongitude", -120f);
+//            editor.apply();
+//            MockLocationService locationService = new MockLocationService(activity);
+//            activity.setMarkerAngles(locationService);
+//            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
+//            assertTrue(family.isShown());
+//        });
+//    }
+//
+//    @Test
+//    public void testFamilyNotDisplayed() {
+//        scenario.onActivity(activity -> {
+//            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+//            SharedPreferences.Editor editor = preferences.edit();
+//            if (preferences.contains("familyLatitude")) {
+//                editor.remove("familyLatitude");
+//            }
+//            if (preferences.contains("familyLongitude")) {
+//                editor.remove("familyLongitude");
+//            }
+//            editor.apply();
+//            MockLocationService locationService = new MockLocationService(activity);
+//            activity.setMarkerAngles(locationService);
+//            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
+//            assertFalse(family.isShown());
+//        });
+//    }
+//
+//    @Test
+//    public void testFamilyAngle() {
+//        scenario.onActivity(activity -> {
+//            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+//            SharedPreferences.Editor editor = preferences.edit();
+//            MockLocationService locationService = new MockLocationService(activity);
+//            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
+//            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
+//            editor.putFloat("familyLatitude", 30f);
+//            editor.putFloat("familyLongitude", 0f);
+//            editor.apply();
+//            activity.setMarkerAngles(locationService);
+//            assertEquals(0f, layoutParams.circleAngle, 0);
+//            editor.putFloat("familyLatitude", 0f);
+//            editor.putFloat("familyLongitude", 30f);
+//            editor.apply();
+//            activity.setMarkerAngles(locationService);
+//            assertEquals(90f, layoutParams.circleAngle, 0);
+//            editor.putFloat("familyLatitude", -30f);
+//            editor.putFloat("familyLongitude", 0f);
+//            editor.apply();
+//            activity.setMarkerAngles(locationService);
+//            assertEquals(180f, layoutParams.circleAngle, 0);
+//            editor.putFloat("familyLatitude", 0f);
+//            editor.putFloat("familyLongitude", -30f);
+//            editor.apply();
+//            activity.setMarkerAngles(locationService);
+//            assertEquals(270f, layoutParams.circleAngle, 0);
+//        });
+//    }
+//
+//    @Test
+//    public void testFamilyIconMovesWithUserLocation() {
+//        scenario.onActivity(activity -> {
+//            SharedPreferences preferences = activity.getSharedPreferences("shared", MODE_PRIVATE);
+//            SharedPreferences.Editor editor = preferences.edit();
+//            MockLocationService locationService = new MockLocationService(activity);
+//            TextView family = (TextView) activity.findViewById(R.id.familyHouse);
+//            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) family.getLayoutParams();
+//            locationService.setLocation(30, 0);
+//            editor.putFloat("familyLatitude", 0);
+//            editor.putFloat("familyLongitude", 0);
+//            editor.apply();
+//            activity.setMarkerAngles(locationService);
+//            assertEquals(180, layoutParams.circleAngle, 0);
+//            locationService.setLocation(0, -30);
+//            activity.setMarkerAngles(locationService);
+//            assertEquals(90, layoutParams.circleAngle, 0);
+//        });
+//    }
 }
