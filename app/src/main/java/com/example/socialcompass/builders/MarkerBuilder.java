@@ -24,7 +24,7 @@ public class MarkerBuilder {
         this.markerLayout = (ConstraintLayout) inflater.inflate(R.layout.marker, this.layout, false);
         this.textView = new TextView(context);
         ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        layoutParams.circleRadius = Util.dpToPx(155, context);
+        layoutParams.circleRadius = 0;
         layoutParams.circleConstraint = R.id.pivot;
         layoutParams.circleAngle = 0;
         layoutParams.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
