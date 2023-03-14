@@ -16,6 +16,7 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.renderscript.Sampler;
 import android.util.Pair;
 import android.view.View;
 import android.hardware.Sensor;
@@ -26,6 +27,7 @@ import android.os.Bundle;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
 import com.example.socialcompass.model.Location;
+import com.example.socialcompass.model.LocationRepository;
 import com.example.socialcompass.viewmodel.MainActivityViewModel;
 import com.example.socialcompass.builders.MarkerBuilder;
 import java.util.List;
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // Constants
     private static final int NO_LOCATION = -1;
     private static final int ANIMATION_DURATION = 210;
+    private static final int MAX_CIRCLE_RADIUS = 543;
 
     // SharedPreferences keys
     private static final String NAME_KEY = "name";
@@ -49,8 +52,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private SharedPreferences preferences;
     private Hashtable<String, Float> markerDegrees;
     private Hashtable<String, Float> markerOffsets;
+    private Hashtable<String, Float> markerDistances;
     private Hashtable<String, View> markers;
     private MainActivityViewModel viewModel;
+    private Location userLocation;
+    private int zoomScale;
 
     private void addMarker(Location location) {
         MarkerBuilder builder = new MarkerBuilder(this);
@@ -58,9 +64,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markers.put(location.publicCode, marker);
         markerDegrees.put(location.publicCode, 0f);
         markerOffsets.put(location.publicCode, 0f);
+        markerDistances.put(location.publicCode, 0f);
     }
 
-    protected void updateAngles(List<Location> locations) {
+    protected void updateMarkers(List<Location> locations) {
         if (locations == null) {
             return;
         }
@@ -72,13 +79,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
             double latitude = currLocation.latitude;
             double longitude = currLocation.longitude;
+            updateAngle(key, latitude, longitude);
+            updateDistance(key, latitude, longitude);
+        }
+    }
+
+    protected void updateAngle(String key, double latitude, double longitude) {
             double angle = calculateAngle(latitude, longitude);
             if (angle != NO_LOCATION) {
                 markerOffsets.replace(key, (float)angle);
                 rotateView(markers.get(key), markerDegrees.get(key), markerDegrees.get(key), markerOffsets.get(key));
-                markers.get(key).setVisibility(View.VISIBLE);
             }
-        }
+    }
+
+    protected void updateDistance(String key, double latitude, double longitude) {
+            double distance = calculateDistance(latitude, longitude);
+            if (distance != NO_LOCATION) {
+                markerDistances.replace(key, (float)distance);
+                setMarkerDistance(markers.get(key), distance);
+            }
     }
 
     /**
@@ -89,16 +108,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      */
     protected double calculateAngle(double latitude, double longitude) {
         Pair<Double, Double> location = this.locationService.getLocation().getValue();
-        if (location != null) {
-            double devLatitude = Math.toRadians(location.first);
-            latitude = Math.toRadians(latitude);
-            double devLongitude = location.second;
-            double longDiff = Math.toRadians(longitude-devLongitude);
-            double y = Math.sin(longDiff)*Math.cos(latitude);
-            double x = Math.cos(devLatitude)*Math.sin(latitude)-Math.sin(devLatitude)*Math.cos(latitude)*Math.cos(longDiff);
-            return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+        if (location == null) {
+            return NO_LOCATION;
         }
-        return NO_LOCATION;
+        double devLatitude = Math.toRadians(location.first);
+        latitude = Math.toRadians(latitude);
+        double devLongitude = location.second;
+        double longDiff = Math.toRadians(longitude-devLongitude);
+        double y = Math.sin(longDiff)*Math.cos(latitude);
+        double x = Math.cos(devLatitude)*Math.sin(latitude)-Math.sin(devLatitude)*Math.cos(latitude)*Math.cos(longDiff);
+        return (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+    }
+
+    protected double calculateDistance(double latitude, double longitude) {
+        Pair<Double, Double> location = this.locationService.getLocation().getValue();
+        if (location == null) {
+            return NO_LOCATION;
+        }
+        double R = 3963.1676; // Radius of the earth in mi
+        double devLatitude = location.first;
+        double devLongitude = location.second;
+        double dLat = Math.toRadians(latitude-devLatitude);  // deg2rad below
+        double dLon = Math.toRadians(longitude-devLongitude);
+        double angle = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(Math.toRadians(devLatitude)) *
+                Math.cos(Math.toRadians(latitude)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(angle), Math.sqrt(1-angle));
+        return R * c; // Distance in mi
     }
 
     /**
@@ -128,27 +163,45 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markers = new Hashtable<String, View>();
         markerDegrees = new Hashtable<String, Float>();
         markerOffsets = new Hashtable<String, Float>();
+        markerDistances = new Hashtable<String, Float>();
+        zoomScale = 10;
+
+
+        // View Model and Observers
+        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        Observer<List<Location>> locationsObserver = this::updateMarkers;
+        viewModel.getLocations().observe(this, locationsObserver);
 
         // Set permissions if not already set
         setPermissions();
         locationService = LocationService.singleton(this);
-        locationService.getLocation().observe(this, location -> updateAngles(viewModel.getLocations().getValue()));
 
         // View initialization
         setContentView(R.layout.activity_main);
         // check if name has been saved
-        String name = preferences.getString(NAME_KEY, null);
-        if (name == null) {
+        String nameCheck = preferences.getString(NAME_KEY, null);
+        if (nameCheck == null) {
             SharedPreferences.Editor editor = preferences.edit();
             Util.showNamePrompt(this, this, editor); // prompt to enter name
         }
 
+
+        locationService.getLocation().observe(this, location -> {
+            String uid = preferences.getString(UID_KEY, null);
+            String name = preferences.getString(NAME_KEY, null);
+            if (name != null) {
+                updateMarkers(viewModel.getLocations().getValue());
+                double latitude = location.first;
+                double longitude = location.second;
+                this.userLocation = new Location(uid, uid, name, (float) latitude, (float) longitude, false, 0, 0);
+                viewModel.pushLocation(this.userLocation);
+            }
+        });
         // -------------------------------------------------------------------------------------- //
         //                                     MS2 Stuff Below                                    //
         // -------------------------------------------------------------------------------------- //
 
         // assign viewModel to safely hold MainActivity state outside it's lifecycle
-        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
         // create an Observer which updates the UI whenever the list of locations changes
         // which should happen everytime we update our local database because
@@ -156,8 +209,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //
         // search up "Write asynchronous DAO queries" and "LiveData" and "ViewModel" if
         // you haven't already
-        Observer<List<Location>> locationsObserver = this::updateAngles;
-        viewModel.getLocations().observe(this, locationsObserver);
+
     }
 
     public void onAddFriendButtonClick(View view) {
@@ -187,15 +239,30 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
      * @param view: The view to rotate
      * @param startAngle: The current angle of the view
      * @param endAngle: The ending angle of the view
-     * @param initialDegree: The angle of the coordinates of the view with respect to 0 degrees
+     * @param degreeOffset: The angle of the coordinates of the view with respect to 0 degrees
      */
-    private void rotateView(View view, float startAngle, float endAngle, float initialDegree) {
+    private void rotateView(View view, float startAngle, float endAngle, float degreeOffset) {
         // Change circle constraint angle
         ValueAnimator anim = ValueAnimator.ofFloat(startAngle, endAngle);
         anim.addUpdateListener(valueAnimator -> {
             float val = (Float) valueAnimator.getAnimatedValue();
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) view.getLayoutParams();
-            layoutParams.circleAngle = val + initialDegree;
+            layoutParams.circleAngle = val + degreeOffset;
+            view.setLayoutParams(layoutParams);
+        });
+        anim.setDuration(ANIMATION_DURATION);
+        anim.setInterpolator(new LinearInterpolator());
+        anim.start();
+    }
+
+    private void setMarkerDistance(View view, double distance) {
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)view.getLayoutParams();
+        int initialRadius = layoutParams.circleRadius;
+        int finalRadius = (int)((distance / this.zoomScale) * MAX_CIRCLE_RADIUS);
+        ValueAnimator anim = ValueAnimator.ofInt(initialRadius, finalRadius);
+        anim.addUpdateListener(valueAnimator -> {
+            int val = (Integer) valueAnimator.getAnimatedValue();
+            layoutParams.circleRadius = val;
             view.setLayoutParams(layoutParams);
         });
         anim.setDuration(ANIMATION_DURATION);

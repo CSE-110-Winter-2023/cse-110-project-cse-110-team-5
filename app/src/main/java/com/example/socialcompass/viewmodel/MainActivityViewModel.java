@@ -25,7 +25,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         var dao = db.locationDao();
         this.repo = new LocationRepository(dao);
         this.locations = repo.getAllLocal();
-        //repo.pollForUpdates();
+        repo.pollForUpdates();
     }
 
     /**
@@ -34,5 +34,9 @@ public class MainActivityViewModel extends AndroidViewModel {
      */
     public LiveData<List<Location>> getLocations() {
         return locations;
+    }
+
+    public void pushLocation(@NonNull Location location) {
+        repo.pushUserLocation(location);
     }
 }
