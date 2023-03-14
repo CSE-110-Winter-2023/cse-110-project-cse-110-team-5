@@ -5,10 +5,13 @@
  */
 package com.example.socialcompass;
 
-import static com.example.socialcompass.LocationEntryActivity.UI_DEGREES;
+import static com.example.socialcompass.AddFriendActivity.UI_DEGREES;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.content.Intent;
@@ -25,6 +28,11 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.RotateAnimation;
 import android.widget.TextView;
+
+import com.example.socialcompass.model.Location;
+import com.example.socialcompass.viewmodel.MainActivityViewModel;
+
+import java.util.List;
 
 import java.util.UUID;
 
@@ -48,6 +56,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private float [] currentDegrees;
     private float [] initialDegrees;
     private View [] markers;
+
+    private MainActivityViewModel viewModel;
 
     /**
      * Sets the angles of all the markers according to their coordinates and the device orientation
@@ -171,18 +181,36 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setMarkerAngles(locationService);
         setMarkerLabels();
 
+        // -------------------------------------------------------------------------------------- //
+        //                                     MS2 Stuff Below                                    //
+        // -------------------------------------------------------------------------------------- //
+
+        // assign viewModel to safely hold MainActivity state outside it's lifecycle
+        viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+
+        // create an Observer which updates the UI whenever the list of locations changes
+        // which should happen everytime we update our local database because
+        // we are using something known as observable queries
+        //
+        // search up "Write asynchronous DAO queries" and "LiveData" and "ViewModel" if
+        // you haven't already
+        Observer<List<Location>> locationsObserver = new Observer<List<Location>>() {
+            @Override
+            public void onChanged(List<Location> locations) {
+                // update the UI here using the new modified list of
+                // locations
+            }
+        };
+
+        viewModel.getLocations().observe(this, locationsObserver);
+
 
     }
 
-    /**
-     * Behavior of Location button
-     * @param view: The ButtonView that triggered the method
-     */
-    public void onLocationsButtonClick(View view) {
-        Intent intent = new Intent(this, LocationEntryActivity.class);
+    public void onAddFriendButtonClick(View view) {
+        Intent intent = new Intent(this, AddFriendActivity.class);
         startActivity(intent);
     }
-
     /**
      * App behavior when resumed
      */
