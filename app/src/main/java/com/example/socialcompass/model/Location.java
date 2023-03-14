@@ -18,8 +18,8 @@ public class Location {
 
     public Location(
             @NonNull String publicCode,
-            @NonNull String privateCode,
-            @NonNull String label,
+            String privateCode,
+            String label,
             float latitude,
             float longitude,
             boolean listedPublicly,
@@ -46,12 +46,10 @@ public class Location {
     // consequently, null for everyone but us ... may possibly
     // get rid of completely depending on how we store our private_code
     // (i.e. we just access the code through shared preferences)
-    @NonNull
     @SerializedName("private_code")
     @ColumnInfo(name = "private_code")
     public String privateCode;
 
-    @NonNull
     @SerializedName("label")
     @ColumnInfo(name = "label")
     public String label;

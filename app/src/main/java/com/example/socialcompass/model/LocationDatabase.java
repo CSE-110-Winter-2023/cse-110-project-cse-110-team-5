@@ -35,6 +35,8 @@ public abstract class LocationDatabase extends RoomDatabase {
 
     private static LocationDatabase makeDatabase(Context context) {
         return Room.databaseBuilder(context, LocationDatabase.class, "locations.db")
-                .allowMainThreadQueries().build();
+                .fallbackToDestructiveMigration()
+                .allowMainThreadQueries()
+                .build();
     }
 }
