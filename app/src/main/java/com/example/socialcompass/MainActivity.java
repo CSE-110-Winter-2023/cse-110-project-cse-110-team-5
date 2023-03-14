@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Hashtable<String, Float> markerOffsets;
     private Hashtable<String, Float> markerDistances;
     private Hashtable<String, View> markers;
+    private Hashtable<String, String> invisibleLabels;
     private MainActivityViewModel viewModel;
     private Location userLocation;
     private int zoomScale;
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             double distance = calculateDistance(latitude, longitude);
             if (distance != NO_LOCATION) {
                 markerDistances.replace(key, (float)distance);
-                setMarkerDistance(markers.get(key), distance);
+                setMarkerDistance(key, distance);
             }
     }
 
@@ -164,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markerDegrees = new Hashtable<String, Float>();
         markerOffsets = new Hashtable<String, Float>();
         markerDistances = new Hashtable<String, Float>();
+        invisibleLabels = new Hashtable<String, String>();
         zoomScale = 10;
 
 
@@ -255,10 +257,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         anim.start();
     }
 
-    private void setMarkerDistance(View view, double distance) {
+    private void setMarkerDistance(String key, double distance) {
+        View view = markers.get(key);
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)view.getLayoutParams();
         int initialRadius = layoutParams.circleRadius;
-        int finalRadius = (int)((distance / this.zoomScale) * MAX_CIRCLE_RADIUS);
+        double radiusMult = (distance / this.zoomScale);
+        if (radiusMult >= 1) {
+            if (!invisibleLabels.containsKey(key)) {
+                layoutParams.circleRadius = MAX_CIRCLE_RADIUS;
+                invisibleLabels.put(key, (String)((TextView)markers.get(key)).getText());
+                ((TextView)view).setText("⬤");
+            }
+            return;
+        }
+        if (invisibleLabels.containsKey(key)) {
+            ((TextView)view).setText(invisibleLabels.get(key));
+            invisibleLabels.remove(key);
+        }
+        int finalRadius = (int)( radiusMult * MAX_CIRCLE_RADIUS);
         ValueAnimator anim = ValueAnimator.ofInt(initialRadius, finalRadius);
         anim.addUpdateListener(valueAnimator -> {
             int val = (Integer) valueAnimator.getAnimatedValue();
