@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">SocialCompass</string>
     <string name="parents">Parents</string>
+    <string name="locations">Locations</string>
+    <string name="template">TEMPLATE</string>
     <string name="addFriend">Add Friends</string>
     <string name="title_activity_add_friend">AddFriendActivity</string>
     <!-- Strings used for fragments for navigation -->
@@ -8,7 +10,6 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
 </resources>

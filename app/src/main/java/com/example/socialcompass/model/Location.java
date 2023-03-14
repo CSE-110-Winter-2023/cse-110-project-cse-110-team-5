@@ -83,8 +83,7 @@ public class Location {
     public static List<Location> fromJSONArray(String json) {
         var gson = new Gson();
         var type = new TypeToken<List<Location>>(){}.getType();
-        List<Location> listOfLocations = gson.fromJson(json, type);
-        return listOfLocations;
+        return gson.fromJson(json, type);
     }
 
     public String toJSON() {

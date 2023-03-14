@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.socialcompass.model.Location;
+import com.example.socialcompass.model.LocationBuilder;
 import com.example.socialcompass.model.LocationDao;
 import com.example.socialcompass.model.LocationDatabase;
 import com.example.socialcompass.model.LocationRepository;
