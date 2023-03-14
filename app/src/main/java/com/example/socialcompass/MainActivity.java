@@ -133,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setPermissions();
         locationService = LocationService.singleton(this);
         locationService.getLocation().observe(this, location -> updateAngles(viewModel.getLocations().getValue()));
+        // TODO update distance values on location change
 
         // View initialization
         setContentView(R.layout.activity_main);
@@ -241,5 +242,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
         //nothing
+    }
+    public void onZoomInClick(View view) {
+
+    }
+
+    public void onZoomOutClick(View view) {
+
     }
 }
