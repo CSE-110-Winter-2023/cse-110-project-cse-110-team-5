@@ -37,6 +37,7 @@ import com.example.socialcompass.builders.MarkerBuilder;
 import java.util.List;
 import java.util.Hashtable;
 
+
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     // Constants
     private static final int NO_LOCATION = -1;
@@ -55,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Hashtable<String, Float> markerOffsets;
     private Hashtable<String, View> markers;
     private MainActivityViewModel viewModel;
-
 
     private void addMarker(Location location) {
         MarkerBuilder builder = new MarkerBuilder(this);
@@ -141,13 +141,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // View initialization
         setContentView(R.layout.activity_main);
-
         // check if name has been saved
         String name = preferences.getString(NAME_KEY, null);
         if (name == null) {
             SharedPreferences.Editor editor = preferences.edit();
             Util.showNamePrompt(this, this, editor); // prompt to enter name
         }
+
 
         // -------------------------------------------------------------------------------------- //
         //                                     MS2 Stuff Below                                    //

@@ -25,7 +25,6 @@ public class MainActivityViewModel extends AndroidViewModel {
         var dao = db.locationDao();
         this.repo = new LocationRepository(dao);
         this.locations = repo.getAllLocal();
-
         //repo.pollForUpdates();
     }
 
@@ -33,8 +32,7 @@ public class MainActivityViewModel extends AndroidViewModel {
      * Method to get all the friend locations we have in our database
      * live data getValue() may return null if database is empty
      */
-    public LiveData<List<Location>> getLocations()
-    {
+    public LiveData<List<Location>> getLocations() {
         return locations;
     }
 }

@@ -35,7 +35,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.room:room-common:2.5.0'
     def gson_version = "2.9.0"
     def room_version = "2.4.2"
 
