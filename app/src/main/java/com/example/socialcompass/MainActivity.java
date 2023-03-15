@@ -31,6 +31,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.socialcompass.builders.MarkerBuilder;
 import com.example.socialcompass.model.Location;
+import com.example.socialcompass.model.LocationAPI;
 import com.example.socialcompass.viewmodel.MainActivityViewModel;
 
 import java.util.Hashtable;
@@ -353,5 +354,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
         //nothing
+    }
+
+    public void onMockUrlSaveButtonClicked(View view) {
+        LocationAPI locationAPI = new LocationAPI();
+        TextView newURL = findViewById(R.id.mockUrl);
+        String url = newURL.getText().toString();
+        locationAPI.ChangeBaseUrl(url);
     }
 }
