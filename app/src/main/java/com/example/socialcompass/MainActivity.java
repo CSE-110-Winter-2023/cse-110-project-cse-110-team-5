@@ -167,8 +167,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             float hours = minutes / 60f;
             String time = "";
             time += (int)hours != 0 ? (int)hours + "hr " : "";
-            time += (int)minutes != 0 ? (int)minutes + "m " : "";
-            time += (int)seconds != 0 ? (int)seconds + "s" : "";
+            time += (int)minutes != 0 ? (int)minutes + "m" : "";
             disconnectionTime.setText(time);
         }
     }
