@@ -165,10 +165,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     protected void updateConnectionMarkerAndTime(Pair<Boolean, Long> connectionInfo) {
         if (connectionInfo.first) {
-            connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_red));
+            connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_green));
             disconnectionTime.setText("");
         } else {
-            connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_gray));
+            connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_red));
             disconnectionTime.setText(connectionInfo.second + " min");
         }
     }
