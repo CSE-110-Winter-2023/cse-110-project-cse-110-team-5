@@ -13,10 +13,7 @@ import com.example.socialcompass.model.LocationRepository;
 
 
 public class AddFriendActivity extends AppCompatActivity {
-    private EditText degrees;
     private EditText addFriendEditText;
-
-    public static final String UI_DEGREES = "degreeLabel";
     private LocationRepository repo;
 
     @Override
