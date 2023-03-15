@@ -1,15 +1,12 @@
 package com.example.socialcompass;
 
-import static com.example.socialcompass.AddFriendActivity.UI_DEGREES;
-
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.socialcompass.model.LocationDatabase;
 import com.example.socialcompass.model.LocationRepository;
@@ -61,7 +58,7 @@ public class AddFriendActivity extends AppCompatActivity {
             String raw = degrees.getText().toString();
             SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
-            if (raw == null || raw.equals("")) {
+            if (raw.equals("")) {
                 editor.remove(UI_DEGREES);
             } else {
                 float parsed = Float.parseFloat(degrees.getText().toString());

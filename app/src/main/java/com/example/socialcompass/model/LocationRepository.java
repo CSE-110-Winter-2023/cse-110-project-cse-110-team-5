@@ -8,16 +8,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class LocationRepository {
-    private LocationDao dao;
-    private LocationAPI api;
-    private ScheduledExecutorService getLocationExecutor;
-    private ScheduledExecutorService setLocationExecutor;
+    private final LocationDao dao;
+    private final LocationAPI api;
+    private final ScheduledExecutorService getLocationExecutor;
 
     public LocationRepository(LocationDao dao) {
         this.dao = dao;
         this.api = LocationAPI.provide();
         getLocationExecutor = Executors.newSingleThreadScheduledExecutor();
-        setLocationExecutor = Executors.newSingleThreadScheduledExecutor();
     }
 
     // this returns what is known as an observable query

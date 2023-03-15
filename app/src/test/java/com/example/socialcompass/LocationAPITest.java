@@ -1,33 +1,15 @@
 package com.example.socialcompass;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import android.content.Context;
-
-import androidx.room.Room;
-import androidx.test.core.app.ApplicationProvider;
+import static org.junit.Assert.fail;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-
 import com.example.socialcompass.model.Location;
 import com.example.socialcompass.model.LocationAPI;
 import com.example.socialcompass.model.LocationBuilder;
-import com.example.socialcompass.model.LocationDao;
-import com.example.socialcompass.model.LocationDatabase;
-import com.google.gson.Gson;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class LocationAPITest {
@@ -73,7 +55,7 @@ public class LocationAPITest {
             assertEquals(LocationAPI.SUCCESS_CODE, (int) response.first);
         } catch (Exception e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
     }
 
@@ -99,7 +81,7 @@ public class LocationAPITest {
             assertEquals(LocationAPI.SUCCESS_CODE, (int) response.first);
         } catch (Exception e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
     }
 
@@ -123,7 +105,7 @@ public class LocationAPITest {
             assertEquals(LocationAPI.SUCCESS_CODE, (int) response.first);
         } catch (Exception e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
     }
 
@@ -173,7 +155,7 @@ public class LocationAPITest {
             assertEquals(serverUpdatedLocation.longitude, testLocation2.longitude, 0);
         } catch (Exception e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
     }
 
@@ -219,7 +201,7 @@ public class LocationAPITest {
             assertEquals(serverUpdatedLocation.label, testLocation2.label);
         } catch (Exception e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
     }
 
@@ -265,7 +247,7 @@ public class LocationAPITest {
             assertEquals(serverUpdatedLocation.listedPublicly, testLocation2.listedPublicly);
         } catch (Exception e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
     }
 
@@ -291,7 +273,7 @@ public class LocationAPITest {
             assertEquals(LocationAPI.SUCCESS_CODE, (int) response.first);
         } catch (Exception e) {
             e.printStackTrace();
-            assertTrue(false);
+            fail();
         }
     }
 }

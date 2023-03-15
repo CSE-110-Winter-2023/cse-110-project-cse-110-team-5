@@ -6,33 +6,34 @@
 package com.example.socialcompass;
 
 import static com.example.socialcompass.AddFriendActivity.UI_DEGREES;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
+
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.renderscript.Sampler;
-import android.util.Pair;
-import android.view.View;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Pair;
+import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.TextView;
-import com.example.socialcompass.model.Location;
-import com.example.socialcompass.model.LocationRepository;
-import com.example.socialcompass.viewmodel.MainActivityViewModel;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.socialcompass.builders.MarkerBuilder;
-import java.util.List;
+import com.example.socialcompass.model.Location;
+import com.example.socialcompass.viewmodel.MainActivityViewModel;
+
 import java.util.Hashtable;
-import java.util.UUID;
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             double distance = calculateDistance(latitude, longitude);
             if (distance != NO_LOCATION) {
                 markerDistances.replace(key, (float)distance);
-                setMarkerDistance(key, distance);
+                setMarkerDistance(key);
             }
     }
 
@@ -161,11 +162,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         preferences = getSharedPreferences("shared", MODE_PRIVATE);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        markers = new Hashtable<String, View>();
-        markerDegrees = new Hashtable<String, Float>();
-        markerOffsets = new Hashtable<String, Float>();
-        markerDistances = new Hashtable<String, Float>();
-        invisibleLabels = new Hashtable<String, String>();
+        markers = new Hashtable<>();
+        markerDegrees = new Hashtable<>();
+        markerOffsets = new Hashtable<>();
+        markerDistances = new Hashtable<>();
+        invisibleLabels = new Hashtable<>();
         zoomScale = 10;
 
 
@@ -257,12 +258,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         anim.start();
     }
 
-    private void setMarkerDistance(String key, double distance) {
+    private void setMarkerDistance(String key) {
+        if (!markerDistances.containsKey(key))
+            return;
+        double distance = this.markerDistances.get(key);
         View view = markers.get(key);
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)view.getLayoutParams();
         int initialRadius = layoutParams.circleRadius;
-        double radiusMult = (distance / this.zoomScale);
-        if (radiusMult >= 1) {
+        double radiusMultiplier = (distance / this.zoomScale);
+        if (radiusMultiplier >= 1) {
             if (!invisibleLabels.containsKey(key)) {
                 layoutParams.circleRadius = MAX_CIRCLE_RADIUS;
                 invisibleLabels.put(key, (String)((TextView)markers.get(key)).getText());
@@ -274,11 +278,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             ((TextView)view).setText(invisibleLabels.get(key));
             invisibleLabels.remove(key);
         }
-        int finalRadius = (int)( radiusMult * MAX_CIRCLE_RADIUS);
+        int finalRadius = (int)( radiusMultiplier * MAX_CIRCLE_RADIUS);
         ValueAnimator anim = ValueAnimator.ofInt(initialRadius, finalRadius);
         anim.addUpdateListener(valueAnimator -> {
-            int val = (Integer) valueAnimator.getAnimatedValue();
-            layoutParams.circleRadius = val;
+            layoutParams.circleRadius = (Integer) valueAnimator.getAnimatedValue();
             view.setLayoutParams(layoutParams);
         });
         anim.setDuration(ANIMATION_DURATION);

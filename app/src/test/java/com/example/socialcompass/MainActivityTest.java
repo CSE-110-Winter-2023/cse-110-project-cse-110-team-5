@@ -2,31 +2,25 @@ package com.example.socialcompass;
 
 
 import static android.content.Context.MODE_PRIVATE;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import android.app.AlertDialog;
+import android.content.SharedPreferences;
+import android.widget.ImageView;
+
+import androidx.lifecycle.Lifecycle;
+import androidx.test.core.app.ActivityScenario;
+import androidx.test.rule.GrantPermissionRule;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.shadows.ShadowAlertDialog;
-
-import static org.junit.Assert.*;
-
-import android.app.AlertDialog;
-import android.content.SharedPreferences;
-import android.hardware.SensorEvent;
-import android.location.Location;
-import android.location.LocationManager;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.Lifecycle;
-import androidx.test.core.app.ActivityScenario;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.rule.GrantPermissionRule;
 
 @RunWith(RobolectricTestRunner.class)
 public class MainActivityTest {
@@ -46,7 +40,7 @@ public class MainActivityTest {
     @Test
     public void testIfArrowDisplayed() {
         scenario.onActivity(activity -> {
-            ImageView arrow = (ImageView) activity.findViewById(R.id.arrow);
+            ImageView arrow = activity.findViewById(R.id.arrow);
             assertTrue(arrow.isShown());
         });
     }
@@ -54,7 +48,7 @@ public class MainActivityTest {
     @Test
     public void testIfCircleDisplayed(){
         scenario.onActivity(activity -> {
-            ImageView circle = (ImageView) activity.findViewById(R.id.circle);
+            ImageView circle = activity.findViewById(R.id.circle);
             assertTrue(circle.isShown());
         });
     }
@@ -62,7 +56,7 @@ public class MainActivityTest {
     @Test
     public void testArrowOrientatedNorth(){
         scenario.onActivity(activity -> {
-            ImageView arrow = (ImageView) activity.findViewById(R.id.arrow);
+            ImageView arrow = activity.findViewById(R.id.arrow);
             assertEquals((int)arrow.getRotation(), 90);
         });
     }

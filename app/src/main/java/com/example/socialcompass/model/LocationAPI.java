@@ -1,37 +1,24 @@
 package com.example.socialcompass.model;
 
 
-import android.util.Log;
 import android.util.Pair;
-import android.view.ViewDebug;
-
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
-
 import com.google.gson.Gson;
-
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class LocationAPI {
-
     private final static String BASE_URL = "https://socialcompass.goto.ucsd.edu/";
     private final static String LOCATION_ENDPOINT = "location/";
     private final static String LOCATIONS_ENDPOINT = "locations";
-
     public final static int SUCCESS_CODE = 200;
-    public final static int VALIDATION_ERROR = 422;
     private volatile static LocationAPI instance = null;
-
-    private OkHttpClient client;
-
-    private Gson gson;
+    private final OkHttpClient client;
+    private final Gson gson;
 
     public LocationAPI() {
         this.client = new OkHttpClient();
@@ -61,7 +48,6 @@ public class LocationAPI {
             assert response.code() == SUCCESS_CODE;
             assert response.body() != null;
             bodyAndCode = new Pair<>(response.code(), response.body().string());
-            Log.i("LocationAPI: getAll ", bodyAndCode.second);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,7 +60,6 @@ public class LocationAPI {
      * @return response code (int) and response json array body (string)
      */
     public CompletableFuture<Pair<Integer, String>> getAllAsync() {
-        Pair<Integer, String> bodyAndCode = null;
         var request = new Request.Builder()
                 .url(BASE_URL + LOCATIONS_ENDPOINT)
                 .method("GET", null)
@@ -103,19 +88,15 @@ public class LocationAPI {
         // URLs cannot contain spaces, so we replace them with %20.
         publicCode = publicCode.replace(" ", "%20");
         Pair<Integer, String> bodyAndCode = null;
-        Log.i("LocationAPI: get ", BASE_URL + LOCATION_ENDPOINT + publicCode);
-
         var request = new Request.Builder()
                 .url(BASE_URL + LOCATION_ENDPOINT + publicCode)
                 .get()
                 .build();
 
         try (var response = client.newCall(request).execute()) {
-            Log.i("LocationAPI: get response: ", String.valueOf(response.code()));
             assert response.code() == SUCCESS_CODE;
             assert response.body() != null;
             bodyAndCode = new Pair<>(response.code(), response.body().string());
-            Log.i("LocationAPI: get ", bodyAndCode.second);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -132,8 +113,6 @@ public class LocationAPI {
     public CompletableFuture<Pair<Integer, String>> getAsync(String publicCode) {
         // URLs cannot contain spaces, so we replace them with %20.
         publicCode = publicCode.replace(" ", "%20");
-        Log.i("LocationAPI: get ", BASE_URL + LOCATION_ENDPOINT + publicCode);
-
         var request = new Request.Builder()
                 .url(BASE_URL + LOCATION_ENDPOINT + publicCode)
                 .get()
@@ -141,7 +120,6 @@ public class LocationAPI {
 
         return CompletableFuture.supplyAsync(() -> {
             try (var response = client.newCall(request).execute()) {
-                Log.i("LocationAPI: get response: ", String.valueOf(response.code()));
                 assert response.code() == SUCCESS_CODE;
                 assert response.body() != null;
                 return new Pair<>(response.code(), response.body().string());
@@ -164,13 +142,13 @@ public class LocationAPI {
         String publicCode = location.publicCode.replace(" ", "%20");
         Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
-                        "private_code", location.privateCode,
-                        "label", location.label,
-                        "latitude", location.latitude,
-                        "longitude", location.longitude
-                ))
+                                "private_code", location.privateCode,
+                                "label", location.label,
+                                "latitude", location.latitude,
+                                "longitude", location.longitude
+                        )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()
@@ -182,7 +160,6 @@ public class LocationAPI {
             assert response.code() == SUCCESS_CODE;
             assert response.body() != null;
             bodyAndCode = new Pair<>(response.code(), response.body().string());
-            Log.i("LocationAPI: put ", bodyAndCode.second);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -198,15 +175,14 @@ public class LocationAPI {
     public CompletableFuture<Pair<Integer, String>> putAsync(@NonNull Location location) {
         // URLs cannot contain spaces, so we replace them with %20.
         String publicCode = location.publicCode.replace(" ", "%20");
-        Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
                         "private_code", location.privateCode,
                         "label", location.label,
                         "latitude", location.latitude,
                         "longitude", location.longitude
-                ))
+                )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()
@@ -216,7 +192,6 @@ public class LocationAPI {
 
         return CompletableFuture.supplyAsync(() -> {
             try (var response = client.newCall(request).execute()) {
-                Log.i("LocationAPI: put response: ", String.valueOf(response.code()));
                 assert response.code() == SUCCESS_CODE;
                 assert response.body() != null;
                 return new Pair<>(response.code(), response.body().string());
@@ -239,10 +214,10 @@ public class LocationAPI {
         String publicCode = location.publicCode.replace(" ", "%20");
         Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
                         "private_code", location.privateCode
-                ))
+                )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()
@@ -269,12 +244,11 @@ public class LocationAPI {
     public CompletableFuture<Pair<Integer, String>> deleteAsync(@NonNull Location location) {
         // URLs cannot contain spaces, so we replace them with %20.
         String publicCode = location.publicCode.replace(" ", "%20");
-        Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
                         "private_code", location.privateCode
-                ))
+                )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()
@@ -286,7 +260,6 @@ public class LocationAPI {
             try (var response = client.newCall(request).execute()) {
                 assert response.code() == SUCCESS_CODE;
                 assert response.body() != null;
-                Log.i("LocationAPI: delete ", response.body().toString());
                 return new Pair<>(response.code(), response.body().string());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -307,11 +280,11 @@ public class LocationAPI {
         String publicCode = location.publicCode.replace(" ", "%20");
         Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
                         "private_code", location.privateCode,
                         "is_listed_publicly", location.listedPublicly
-                ))
+                )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()
@@ -323,7 +296,6 @@ public class LocationAPI {
             assert response.code() == SUCCESS_CODE;
             assert response.body() != null;
             bodyAndCode = new Pair<>(response.code(), response.body().string());
-            Log.i("LocationAPI: publish ", bodyAndCode.second);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -339,13 +311,12 @@ public class LocationAPI {
     public CompletableFuture<Pair<Integer, String>> publishAsync(@NonNull Location location) {
         // URLs cannot contain spaces, so we replace them with %20.
         String publicCode = location.publicCode.replace(" ", "%20");
-        Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
                         "private_code", location.privateCode,
                         "is_listed_publicly", location.listedPublicly
-                ))
+                )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()
@@ -376,11 +347,11 @@ public class LocationAPI {
         String publicCode = location.publicCode.replace(" ", "%20");
         Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
                         "private_code", location.privateCode,
                         "label", location.label
-                ))
+                )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()
@@ -392,7 +363,6 @@ public class LocationAPI {
             assert response.code() == SUCCESS_CODE;
             assert response.body() != null;
             bodyAndCode = new Pair<>(response.code(), response.body().string());
-            Log.i("LocationAPI: rename ", bodyAndCode.second);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -408,13 +378,12 @@ public class LocationAPI {
     public CompletableFuture<Pair<Integer, String>> relabelAsync(@NonNull Location location) {
         // URLs cannot contain spaces, so we replace them with %20.
         String publicCode = location.publicCode.replace(" ", "%20");
-        Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
                         "private_code", location.privateCode,
                         "label", location.label
-                ))
+                )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()
@@ -445,12 +414,12 @@ public class LocationAPI {
         String publicCode = location.publicCode.replace(" ", "%20");
         Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
                         "private_code", location.privateCode,
                         "latitude", location.latitude,
                         "longitude", location.longitude
-                ))
+                )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()
@@ -462,7 +431,6 @@ public class LocationAPI {
             assert response.code() == SUCCESS_CODE;
             assert response.body() != null;
             bodyAndCode = new Pair<>(response.code(), response.body().string());
-            Log.i("LocationAPI: updateCoordinates ", bodyAndCode.second);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -478,14 +446,13 @@ public class LocationAPI {
     public CompletableFuture<Pair<Integer, String>> updateCoordinatesAsync(@NonNull Location location) {
         // URLs cannot contain spaces, so we replace them with %20.
         String publicCode = location.publicCode.replace(" ", "%20");
-        Pair<Integer, String> bodyAndCode = null;
         var requestBody = RequestBody.create(
-                MediaType.parse("application/json"),
                 gson.toJson(Map.of(
                         "private_code", location.privateCode,
                         "latitude", location.latitude,
                         "longitude", location.longitude
-                ))
+                )),
+                MediaType.parse("application/json")
         );
 
         var request = new Request.Builder()

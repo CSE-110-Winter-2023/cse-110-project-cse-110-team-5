@@ -7,16 +7,14 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.socialcompass.model.Location;
-import com.example.socialcompass.model.LocationBuilder;
-import com.example.socialcompass.model.LocationDao;
 import com.example.socialcompass.model.LocationDatabase;
 import com.example.socialcompass.model.LocationRepository;
 
 import java.util.List;
 
 public class MainActivityViewModel extends AndroidViewModel {
-    private LiveData<List<Location>> locations;
-    private LocationRepository repo;
+    private final LiveData<List<Location>> locations;
+    private final LocationRepository repo;
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);

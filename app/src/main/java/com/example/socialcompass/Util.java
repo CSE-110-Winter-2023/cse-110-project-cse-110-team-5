@@ -26,7 +26,7 @@ public final class Util {
     public static void saveFloat(SharedPreferences.Editor editor, EditText uiComponent, String key) {
         String str = uiComponent.getText().toString();
         try {
-            if (str != null && !str.equals("")) {
+            if (!str.equals("")) {
                 float parsed = Float.parseFloat(str);
                 editor.putFloat(key, parsed);
             } else {
@@ -88,9 +88,7 @@ public final class Util {
                 .setTitle("Reminder!")
                 .setMessage("Your unique user ID is " + uniqueID +
                         " make sure to share this with your friends so they can track you.")
-                .setPositiveButton("OK", (dialog, id) -> {
-                    dialog.cancel();
-                })
+                .setPositiveButton("OK", (dialog, id) -> dialog.cancel())
                 .setCancelable(true);
 
         AlertDialog alertDialog = alertBuilder.create();

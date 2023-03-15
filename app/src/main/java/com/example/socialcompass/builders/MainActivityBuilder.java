@@ -3,7 +3,6 @@ package com.example.socialcompass.builders;
 import static android.content.Context.MODE_PRIVATE;
 import static android.content.Context.SENSOR_SERVICE;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
@@ -21,8 +20,8 @@ public class MainActivityBuilder {
     private SensorManager sensorManager;
     private Sensor magneticFieldSensor;
     private Hashtable<String, View> markers;
-    private Hashtable<String, Float> markerDegrees;
-    private Hashtable<String, Float> markerOffsets;
+    private final Hashtable<String, Float> markerDegrees;
+    private final Hashtable<String, Float> markerOffsets;
     private LocationService locationService;
 
     public MainActivityBuilder(Context context) {
@@ -32,7 +31,7 @@ public class MainActivityBuilder {
         markers = new Hashtable<>();
         markerDegrees = new Hashtable<>();
         markerOffsets = new Hashtable<>();
-        locationService = LocationService.singleton((Activity) context);
+        locationService = LocationService.singleton(context);
     }
 
     public void setPreferences(SharedPreferences preferences) {

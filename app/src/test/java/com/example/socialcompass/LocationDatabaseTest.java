@@ -1,6 +1,7 @@
 package com.example.socialcompass;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -112,7 +113,7 @@ public class LocationDatabaseTest {
 
         dao.deleteLocation(testLocation1);
         boolean itemNotFound = dao.exists(testLocation1.publicCode);
-        assertTrue(!itemNotFound);
+        assertFalse(itemNotFound);
     }
 
     @Test
@@ -123,7 +124,7 @@ public class LocationDatabaseTest {
 
         dao.clear();
         boolean itemNotFound = dao.exists(testLocation1.publicCode);
-        assertTrue(!itemNotFound);
+        assertFalse(itemNotFound);
 
         var stuff = dao.getAllLocations();
         assertNotNull(stuff);
@@ -133,12 +134,12 @@ public class LocationDatabaseTest {
     @Test
     public void testSize() {
         dao.clear();
-        assertTrue(dao.size() == 0);
+        assertEquals(0, dao.size());
 
         dao.insertLocation(testLocation1);
         boolean itemFound = dao.exists(testLocation1.publicCode);
         assertTrue(itemFound);
-        assertTrue(dao.size() == 1);
+        assertEquals(1, dao.size());
     }
 
     @Test

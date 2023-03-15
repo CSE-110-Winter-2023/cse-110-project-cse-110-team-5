@@ -1,7 +1,6 @@
 package com.example.socialcompass;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -20,10 +19,7 @@ import androidx.lifecycle.MutableLiveData;
  */
 public class LocationService implements LocationListener {
     private static LocationService instance;
-    private Activity activity;
-
     private MutableLiveData<Pair<Double, Double>> locationValue;
-
     private final LocationManager locationManager;
 
     /**
@@ -31,11 +27,11 @@ public class LocationService implements LocationListener {
      *
      * Ensures only one instance of locationManager is ever present
      * by controlling the LocationService constructor call
-     * @param activity
+     * @param context The context of the app when singleton is called
      */
-    public static LocationService singleton(Activity activity) {
+    public static LocationService singleton(Context context) {
         if (instance == null) {
-            instance = new LocationService(activity);
+            instance = new LocationService(context.getApplicationContext());
         }
         return instance;
     }
@@ -44,23 +40,22 @@ public class LocationService implements LocationListener {
      * Constructor
      *
      * Called in singleton method
-     * @param activity
+     * @param context The activity of the app when LocationService is called
      */
-    protected LocationService (Activity activity) {
+    protected LocationService (Context context) {
         this.locationValue = new MutableLiveData<>();
-        this.activity = activity;
-        this.locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+        this.locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         // Register sensor listeners
-        this.registerLocationListener();
+        this.registerLocationListener(context);
     }
 
 
     /**
      *  Check for location permissions before registering location manager.
      */
-    private void registerLocationListener() {
-        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    private void registerLocationListener(Context context) {
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             throw new IllegalStateException("App needs location permission to get latest location");
         }
 
@@ -69,7 +64,7 @@ public class LocationService implements LocationListener {
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        this.locationValue.postValue(new Pair<Double, Double>(location.getLatitude(),
+        this.locationValue.postValue(new Pair<>(location.getLatitude(),
                 location.getLongitude()));
     }
 

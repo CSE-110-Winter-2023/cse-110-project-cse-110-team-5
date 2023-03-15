@@ -1,22 +1,17 @@
 package com.example.socialcompass.builders;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.example.socialcompass.R;
-import com.example.socialcompass.Util;
 
 public class MarkerBuilder {
-    private ConstraintLayout layout;
-    private ConstraintLayout markerLayout;
-    private TextView textView;
+    private final ConstraintLayout layout;
+    private final ConstraintLayout markerLayout;
+    private final TextView textView;
 
     public MarkerBuilder(Activity context) {
         LayoutInflater inflater = LayoutInflater.from(context);
