@@ -162,7 +162,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             disconnectionTime.setText("");
         } else {
             connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_red));
-            disconnectionTime.setText(status.second + " min");
+            float seconds = status.second / 1000f;
+            float minutes = seconds / 60f;
+            float hours = minutes / 60f;
+            String time = "";
+            time += (int)hours != 0 ? (int)hours + "hr " : "";
+            time += (int)minutes != 0 ? (int)minutes + "m " : "";
+            time += (int)seconds != 0 ? (int)seconds + "s" : "";
+            disconnectionTime.setText(time);
         }
     }
 

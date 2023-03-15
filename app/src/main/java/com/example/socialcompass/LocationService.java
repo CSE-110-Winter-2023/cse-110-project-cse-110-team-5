@@ -21,7 +21,7 @@ import java.util.TimerTask;
  * Handles location permission checking and updating.
  */
 public class LocationService implements LocationListener {
-    private final int GPS_TIME_DELAY = 60000;
+    private final int GPS_TIME_DELAY = 1000;
     private static LocationService instance;
     private MutableLiveData<Pair<Double, Double>> locationValue;
     private MutableLiveData<Pair<Boolean, Long>> gpsStatus;
