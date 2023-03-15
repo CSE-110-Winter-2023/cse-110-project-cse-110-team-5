@@ -477,4 +477,8 @@ public class LocationAPI {
     public void ChangeBaseUrl(String newBaseUrl) {
         this.BASE_URL = newBaseUrl;
     }
+
+    public void ResetBaseUrl(){
+        this.BASE_URL = ORIGINAL_URL;
+    }
 }
