@@ -12,14 +12,20 @@ import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.ImageDecoder;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,8 +38,10 @@ import com.example.socialcompass.builders.MarkerBuilder;
 import com.example.socialcompass.model.Location;
 import com.example.socialcompass.viewmodel.MainActivityViewModel;
 
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -58,7 +66,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Hashtable<String, String> invisibleLabels;
     private MainActivityViewModel viewModel;
     private Location userLocation;
-    private int zoomScale;
+    private int zoomScale; // in miles
+    private Bitmap circleBitMap;
 
     private void addMarker(Location location) {
         MarkerBuilder builder = new MarkerBuilder(this);
@@ -94,6 +103,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
     }
 
+    // update the distance of the corresponding marker
+    // with its new long + lat
+    // then update the UI component
     protected void updateDistance(String key, double latitude, double longitude) {
             double distance = calculateDistance(latitude, longitude);
             if (distance != NO_LOCATION) {
@@ -168,7 +180,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markerDistances = new Hashtable<>();
         invisibleLabels = new Hashtable<>();
         zoomScale = 10;
-
+        var imgSource = ImageDecoder.createSource(
+                getResources(),
+                R.drawable.circle_removebg_preview
+        );
 
         // View Model and Observers
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
@@ -178,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Set permissions if not already set
         setPermissions();
         locationService = LocationService.singleton(this);
-        // TODO update distance values on location change
 
         // View initialization
         setContentView(R.layout.activity_main);
@@ -188,6 +202,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             SharedPreferences.Editor editor = preferences.edit();
             Util.showNamePrompt(this, this, editor); // prompt to enter name
         }
+
+        // lazy init cuz i cant call decodeBitmap()
+        // on main thread
+        // hacky as fuck but idc anymore -o-
+        CompletableFuture.supplyAsync(() -> { // fork join pool
+                    try {
+                        return ImageDecoder.decodeBitmap(imgSource);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .thenAcceptAsync(bitmap -> {
+                    this.circleBitMap = bitmap;
+                    Log.d("BITMAP LOAD", "is not null: " + (bitmap != null));
+                    this.updateCircles(false);
+                }, Runnable::run); // run on main thread
 
 
         locationService.getLocation().observe(this, location -> {
@@ -213,7 +243,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //
         // search up "Write asynchronous DAO queries" and "LiveData" and "ViewModel" if
         // you haven't already
-
+        /* ImageView circ = findViewById(R.id.circle);
+        ImageView circ2 = findViewById(R.id.circle2);
+        ImageView circ3 = findViewById(R.id.circle3);
+        circ.setVisibility(View.INVISIBLE);
+        circ2.setVisibility(View.INVISIBLE);
+        circ3.setVisibility(View.INVISIBLE); */
     }
 
     public void onAddFriendButtonClick(View view) {
@@ -259,6 +294,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         anim.start();
     }
 
+    /**
+     * Update the UI component of the marker
+     * corresponding to the given key using internal
+     * state of the activity
+     * @param key the public code of the marker
+     */
     private void setMarkerDistance(String key) {
         if (!markerDistances.containsKey(key))
             return;
@@ -267,6 +308,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)view.getLayoutParams();
         int initialRadius = layoutParams.circleRadius;
         double radiusMultiplier = (distance / this.zoomScale);
+        // if marker distance > our max zoom scale
+        // indicate that marker is too far away to be displayed
         if (radiusMultiplier >= 1) {
             if (!invisibleLabels.containsKey(key)) {
                 layoutParams.circleRadius = MAX_CIRCLE_RADIUS;
@@ -275,10 +318,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
             return;
         }
+        // if it's invisible set it to invisible
         if (invisibleLabels.containsKey(key)) {
             ((TextView)view).setText(invisibleLabels.get(key));
             invisibleLabels.remove(key);
         }
+        // animate movement of the marker to new
+        // radius in circle constraint
         int finalRadius = (int)( radiusMultiplier * MAX_CIRCLE_RADIUS);
         ValueAnimator anim = ValueAnimator.ofInt(initialRadius, finalRadius);
         anim.addUpdateListener(valueAnimator -> {
@@ -329,11 +375,97 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int i) {
         //nothing
     }
-    public void onZoomInClick(View view) {
 
+    private static final int BITMAP_MAX_SIZE = 1300;
+
+    public void onZoomInClick(View view) {
+        this.zoomScale = Math.max(1, this.zoomScale - getZoomInStep(this.zoomScale));
+        this.updateZoomButtons();
+        this.updateCircles(true);
+        this.updateAllMarkers();
     }
 
     public void onZoomOutClick(View view) {
+        this.zoomScale = this.zoomScale + getZoomOutStep(this.zoomScale);
+        this.updateZoomButtons();
+        this.updateCircles(true);
+        this.updateAllMarkers();
+    }
 
+    public static int getZoomOutStep(int currZoomScale) {
+        if (currZoomScale < 10) {
+            return 1;
+        } else if (currZoomScale < 100) {
+            return 10;
+        } else if (currZoomScale < 500) {
+            return 25;
+        } else {
+            return 50;
+        }
+    }
+
+    public static int getZoomInStep(int currZoomScale) {
+        if (currZoomScale <= 10) {
+            return 1;
+        } else if (currZoomScale <= 100) {
+            return 10;
+        } else if (currZoomScale <= 500) {
+            return 25;
+        } else {
+            return 50;
+        }
+    }
+
+    private void updateZoomButtons() {
+        Button btnZoomIn = findViewById(R.id.btn_zoom_in);
+        btnZoomIn.setClickable(this.zoomScale > 1);
+        // Button btnZoomOut = findViewById(R.id.btn_zoom_out);
+        // btnZoomOut.setClickable(this.zoomScale < 500);
+    }
+
+    public void updateAllMarkers() {
+        for (String key : this.markers.keySet()) {
+            this.setMarkerDistance(key);
+        }
+    }
+
+    public void updateCircles(boolean animate) {
+        this.setTitle("zoom scale: " + this.zoomScale);
+        ImageView circ = findViewById(R.id.circle); // 500-inf
+        ImageView circ2 = findViewById(R.id.circle2); // 10-500
+        ImageView circ3 = findViewById(R.id.circle3); // 1-10
+        ImageView circ4 = findViewById(R.id.circle4); // 0-1
+        var circ1BitMap = Bitmap.createScaledBitmap(this.circleBitMap, BITMAP_MAX_SIZE, BITMAP_MAX_SIZE, true);
+        circ.setImageBitmap(circ1BitMap);
+        updateCircleBitmap(circ2, 500, animate);
+        updateCircleBitmap(circ3, 10, animate);
+        updateCircleBitmap(circ4, 1, animate);
+    }
+
+    public void updateCircleBitmap(ImageView circ, int maxDist, boolean animate) {
+        var scalingFactor = ((double) maxDist) / this.zoomScale;
+        scalingFactor = Util.clamp(scalingFactor, 0, 1);
+        var scaledSize = (int) (scalingFactor * BITMAP_MAX_SIZE);
+        if (scaledSize <= 10) {
+            circ.setVisibility(View.INVISIBLE);
+        } else {
+            circ.setVisibility(View.VISIBLE);
+            var currBitmap = ((BitmapDrawable)circ.getDrawable()).getBitmap();
+            var oldSize = currBitmap.getWidth();
+            if (animate) {
+                var animator = ValueAnimator.ofInt(oldSize, scaledSize);
+                animator.addUpdateListener(anim -> {
+                    var val = (int) anim.getAnimatedValue();
+                    var scaledBitmap = Bitmap.createScaledBitmap(this.circleBitMap, val, val, true);
+                    circ.setImageBitmap(scaledBitmap);
+                });
+                animator.setDuration(700);
+                animator.setInterpolator(new LinearInterpolator());
+                animator.start();
+            } else {
+                var scaledBitmap = Bitmap.createScaledBitmap(this.circleBitMap, scaledSize, scaledSize, true);
+                circ.setImageBitmap(scaledBitmap);
+            }
+        }
     }
 }

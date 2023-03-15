@@ -99,4 +99,17 @@ public final class Util {
         Resources r = context.getResources();
         return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
+
+    public static double clamp(double value, double low, double high) {
+        if (high < low) {
+            throw new IllegalArgumentException("high cannot be less than low");
+        }
+        if (value > high) {
+            return high;
+        } else if (value < low) {
+            return low;
+        } else {
+            return value;
+        }
+    }
 }
