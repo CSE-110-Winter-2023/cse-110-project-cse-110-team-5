@@ -163,17 +163,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    protected void updateConnectionMarker(Boolean connected) {
-        if (connected) {
+    protected void updateConnectionMarkerAndTime(Pair<Boolean, Long> connectionInfo) {
+        if (connectionInfo.first) {
             connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_red));
             disconnectionTime.setText("");
         } else {
             connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_gray));
+            disconnectionTime.setText(connectionInfo.second + " min");
         }
-    }
-
-    protected void updateDisconnectionTime(Long secondsDisconnected) {
-        disconnectionTime.setText(secondsDisconnected + " min");
     }
 
     /**
@@ -205,11 +202,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // View Model and Observers
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
         Observer<List<Location>> locationsObserver = this::updateMarkers;
-        Observer<Boolean> connectionObserver = this::updateConnectionMarker;
-        Observer<Long> disconnectionTimeObserver = this::updateDisconnectionTime;
+        Observer<Pair<Boolean, Long>> connectionObserver = this::updateConnectionMarkerAndTime;
         viewModel.getLocations().observe(this, locationsObserver);
-        viewModel.getIsInternetConnected().observe(this, connectionObserver);
-        viewModel.getElapsedMinutes().observe(this, disconnectionTimeObserver);
+        viewModel.getConnectionInfo().observe(this, connectionObserver);
         viewModel.startCheckingInternetConnectivity(connectivityManager);
 
         // Set permissions if not already set
