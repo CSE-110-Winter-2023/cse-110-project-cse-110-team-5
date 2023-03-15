@@ -9,7 +9,7 @@
     <Button
         android:id="@+id/backButton"
         android:layout_width="@dimen/LocationEntryButtonWidth"
-        android:layout_height="@dimen/LocationEntryButtonHeight"
+        android:layout_height="48dp"
         android:onClick="onBackButtonClick"
         android:text="Back to Main"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -20,64 +20,17 @@
         app:layout_constraintVertical_bias="0.944" />
 
     <Button
-        android:id="@+id/saveButton"
+        android:id="@+id/addButton"
         android:layout_width="@dimen/LocationEntryButtonWidth"
-        android:layout_height="@dimen/LocationEntryButtonHeight"
-        android:onClick="onSaveButtonClick"
-        android:text="Save"
+        android:layout_height="48dp"
+        android:onClick="onAddButtonClick"
+        android:text="Add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.938"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.944" />
-
-    <EditText
-        android:id="@+id/degreesEditText"
-        android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryViewHeight"
-        android:ems="10"
-        android:hint="Degrees"
-        android:inputType="numberSigned"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.07"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.868" />
-
-    <TextView
-        android:id="@+id/mockUITextView"
-        android:layout_width="@dimen/LocationEntryViewWidth"
-        android:layout_height="@dimen/LocationEntryViewHeight"
-        android:layout_marginBottom="-20dp"
-        android:text="Mock UI"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.07"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.793" />
-
-    <Button
-        android:id="@+id/mockDegreesButton"
-        android:layout_width="88dp"
-        android:layout_height="48dp"
-        android:layout_marginStart="55dp"
-        android:layout_marginTop="77dp"
-        android:layout_marginEnd="67dp"
-        android:layout_marginBottom="5dp"
-        android:backgroundTint="#48D115"
-        android:onClick="onMockDegreesButtonClick"
-        android:text="OK"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.874"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.858" />
 
     <TextView
         android:id="@+id/addFriendTextView"
