@@ -5,8 +5,6 @@
  */
 package com.example.socialcompass;
 
-import static com.example.socialcompass.AddFriendActivity.UI_DEGREES;
-
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.content.Intent;
@@ -297,10 +295,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent sensorEvent) {
         if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
             float degree = (float) Math.toDegrees(Math.atan2(sensorEvent.values[0], sensorEvent.values[1]));
-            // check if ui mock is on
-            if (preferences.contains(UI_DEGREES)) {
-                return;
-            }
             updateOrientation(degree);
         }
     }

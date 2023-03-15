@@ -1,6 +1,5 @@
 package com.example.socialcompass;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -33,7 +32,7 @@ public class AddFriendActivity extends AppCompatActivity {
         finish(); // back to main activity
     }
 
-    public void onSaveButtonClick(View view) {
+    public void onAddButtonClick(View view) {
         Toast.makeText(getApplicationContext(), "Looking for friend...", Toast.LENGTH_SHORT).show();
         var publicCode = addFriendEditText.getText().toString();
         var location = repo.getRemote(publicCode);
