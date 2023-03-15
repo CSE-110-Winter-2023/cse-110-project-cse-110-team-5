@@ -9,7 +9,9 @@ import static org.junit.Assert.assertTrue;
 
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
@@ -78,6 +80,24 @@ public class MainActivityTest {
             //Haven't set a name, so popup should appear
             AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
             assertNotNull(alertDialog);
+        });
+    }
+
+    @Test
+    public void testConnectionImageViewDisplayed(){
+        scenario.onActivity(activity -> {
+            ImageView connectionSym = activity.findViewById(R.id.connectionImageView);
+            assertTrue(connectionSym.isShown());
+        });
+    }
+
+    @Test
+    public void testDisconnectedTextViewVisibilityWhenConnected(){
+        scenario.onActivity(activity -> {
+            ImageView connectionSym = activity.findViewById(R.id.connectionImageView);
+            connectionSym.setBackgroundColor(Color.parseColor("#3CB043"));
+            TextView minutesInactive = activity.findViewById(R.id.disconnectionTimeTextView);
+            assertEquals(minutesInactive.getText(), "");
         });
     }
 }

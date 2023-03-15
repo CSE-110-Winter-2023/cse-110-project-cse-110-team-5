@@ -7,6 +7,7 @@ package com.example.socialcompass;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -14,10 +15,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,6 +35,7 @@ import com.example.socialcompass.viewmodel.MainActivityViewModel;
 
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Timer;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -48,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private LocationService locationService;
     private SensorManager sensorManager;
     private Sensor magneticFieldSensor;
+    private Timer timer;
+    private ConnectivityManager connectivityManager;
+    private BroadcastReceiver connectivityReceiver;
     private SharedPreferences preferences;
     private Hashtable<String, Float> markerDegrees;
     private Hashtable<String, Float> markerOffsets;
@@ -57,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private MainActivityViewModel viewModel;
     private Location userLocation;
     private int zoomScale;
+    private ImageView connectionMarker;
+    private TextView disconnectionTime;
 
     private void addMarker(Location location) {
         MarkerBuilder builder = new MarkerBuilder(this);
@@ -147,6 +156,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    protected void updateGPSIndicator(Pair<Boolean, Long> status) {
+        if (status.first) {
+            connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_green));
+            disconnectionTime.setText("");
+        } else {
+            connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_red));
+            float seconds = status.second / 1000f;
+            float minutes = seconds / 60f;
+            float hours = minutes / 60f;
+            String time = "";
+            time += (int)hours != 0 ? (int)hours + "hr " : "";
+            time += (int)minutes != 0 ? (int)minutes + "m" : "";
+            disconnectionTime.setText(time);
+        }
+    }
+
     /**
      * App behavior when launched
      * @param savedInstanceState: The saved state of the app
@@ -156,8 +181,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         // MainActivityBuilder mainBuilder = new MainActivityBuilder(this);
 
+        // View initialization
+        setContentView(R.layout.activity_main);
+
         // Instance variable initialization
         preferences = getSharedPreferences("shared", MODE_PRIVATE);
+        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         markers = new Hashtable<>();
@@ -166,19 +195,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markerDistances = new Hashtable<>();
         invisibleLabels = new Hashtable<>();
         zoomScale = 10;
-
+        connectionMarker = findViewById(R.id.connectionImageView);
+        disconnectionTime = findViewById(R.id.disconnectionTimeTextView);
 
         // View Model and Observers
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
         Observer<List<Location>> locationsObserver = this::updateMarkers;
+        Observer<Pair<Boolean, Long>> gpsStatusObserver = this::updateGPSIndicator;
         viewModel.getLocations().observe(this, locationsObserver);
 
         // Set permissions if not already set
         setPermissions();
         locationService = LocationService.singleton(this);
 
-        // View initialization
-        setContentView(R.layout.activity_main);
         // check if name has been saved
         String nameCheck = preferences.getString(NAME_KEY, null);
         if (nameCheck == null) {
@@ -198,6 +227,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 viewModel.pushLocation(this.userLocation);
             }
         });
+        locationService.startSignalTimer();
+        locationService.getGPSStatus().observe(this, gpsStatusObserver);
+
         // -------------------------------------------------------------------------------------- //
         //                                     MS2 Stuff Below                                    //
         // -------------------------------------------------------------------------------------- //

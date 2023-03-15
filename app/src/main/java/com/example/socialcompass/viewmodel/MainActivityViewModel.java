@@ -37,4 +37,5 @@ public class MainActivityViewModel extends AndroidViewModel {
     public void pushLocation(@NonNull Location location) {
         repo.pushUserLocation(location);
     }
+
 }
