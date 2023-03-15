@@ -3,6 +3,7 @@ package com.example.socialcompass.viewmodel;
 import android.app.Application;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -19,13 +20,11 @@ import java.util.TimerTask;
 
 public class MainActivityViewModel extends AndroidViewModel {
     private final LiveData<List<Location>> locations;
-    private MutableLiveData<Boolean> isInternetConnected;
-    private MutableLiveData<Long> elapsedMinutes;
+    private MutableLiveData<Pair<Boolean, Long>> connectionInfo;
 
     private final LocationRepository repo;
     private Timer timer;
     private long startTime = 0;
-
 
     public MainActivityViewModel(@NonNull Application application) {
         super(application);
@@ -34,8 +33,7 @@ public class MainActivityViewModel extends AndroidViewModel {
         var dao = db.locationDao();
         this.repo = new LocationRepository(dao);
         this.locations = repo.getAllLocal();
-        this.isInternetConnected = new MutableLiveData<>();
-        this.elapsedMinutes = new MutableLiveData<>();
+        this.connectionInfo = new MutableLiveData<Pair<Boolean, Long>>();
         repo.pollForUpdates();
     }
 
@@ -51,12 +49,8 @@ public class MainActivityViewModel extends AndroidViewModel {
         repo.pushUserLocation(location);
     }
 
-    public LiveData<Boolean> getIsInternetConnected() {
-        return isInternetConnected;
-    }
-
-    public LiveData<Long> getElapsedMinutes() {
-        return elapsedMinutes;
+    public LiveData<Pair<Boolean,Long>> getConnectionInfo() {
+        return connectionInfo;
     }
 
     public void startCheckingInternetConnectivity(ConnectivityManager connectivityManager) {
@@ -71,11 +65,11 @@ public class MainActivityViewModel extends AndroidViewModel {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                boolean isConnected = checkInternetConnectivity(connectivityManager);
-                long elapsed = calculateElapsedTime();
+                var connected = checkInternetConnectivity(connectivityManager);
+                var timeElapsed = calculateElapsedTime();
 
-                isInternetConnected.postValue(isConnected);
-                elapsedMinutes.postValue(elapsed);
+                if (connected) startTime = System.currentTimeMillis();
+                connectionInfo.postValue(new Pair<>(connected, timeElapsed));
             }
         }, 0, 1000);
     }
