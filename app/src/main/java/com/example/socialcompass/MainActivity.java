@@ -178,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Set permissions if not already set
         setPermissions();
         locationService = LocationService.singleton(this);
-
         // TODO update distance values on location change
 
         // View initialization
