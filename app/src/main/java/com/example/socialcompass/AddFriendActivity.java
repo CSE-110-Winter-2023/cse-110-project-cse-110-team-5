@@ -29,10 +29,6 @@ public class AddFriendActivity extends AppCompatActivity {
         repo = new LocationRepository(db.locationDao());
 
         addFriendEditText = findViewById(R.id.addFriendEditText);
-
-        SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
-        degrees = findViewById(R.id.degreesEditText);
-        degrees.setText(Util.getFloatAsString(preferences, UI_DEGREES));
     }
 
 
@@ -50,28 +46,5 @@ public class AddFriendActivity extends AppCompatActivity {
         }
         Toast.makeText(getApplicationContext(), location.label + " added!", Toast.LENGTH_SHORT).show();
         repo.addLocationToDb(location);
-    }
-
-    public void onMockDegreesButtonClick(View view) {
-        // parse float
-        try {
-            String raw = degrees.getText().toString();
-            SharedPreferences preferences = getSharedPreferences("shared", MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            if (raw.equals("")) {
-                editor.remove(UI_DEGREES);
-            } else {
-                float parsed = Float.parseFloat(degrees.getText().toString());
-                while (parsed < 0) {
-                    parsed += 360;
-                }
-                parsed %= 360;
-                editor.putFloat(UI_DEGREES, parsed);
-            }
-            editor.apply();
-        } catch (IllegalArgumentException e) {
-            return;
-        }
-        finish();
     }
 }
