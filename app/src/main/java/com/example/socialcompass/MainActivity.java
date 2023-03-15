@@ -8,9 +8,7 @@ package com.example.socialcompass;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
@@ -18,9 +16,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -40,7 +36,6 @@ import com.example.socialcompass.viewmodel.MainActivityViewModel;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -161,13 +156,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
-    protected void updateConnectionMarkerAndTime(Pair<Boolean, Long> connectionInfo) {
-        if (connectionInfo.first) {
+    protected void updateGPSIndicator(Pair<Boolean, Long> status) {
+        if (status.first) {
             connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_green));
             disconnectionTime.setText("");
         } else {
             connectionMarker.setImageDrawable(getResources().getDrawable(R.drawable.circle_red));
-            disconnectionTime.setText(connectionInfo.second + " min");
+            disconnectionTime.setText(status.second + " min");
         }
     }
 
@@ -200,10 +195,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // View Model and Observers
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
         Observer<List<Location>> locationsObserver = this::updateMarkers;
-        Observer<Pair<Boolean, Long>> connectionObserver = this::updateConnectionMarkerAndTime;
+        Observer<Pair<Boolean, Long>> gpsStatusObserver = this::updateGPSIndicator;
         viewModel.getLocations().observe(this, locationsObserver);
-        viewModel.getConnectionInfo().observe(this, connectionObserver);
-        viewModel.startCheckingInternetConnectivity(connectivityManager);
 
         // Set permissions if not already set
         setPermissions();
@@ -228,6 +221,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 viewModel.pushLocation(this.userLocation);
             }
         });
+        locationService.startSignalTimer();
+        locationService.getGPSStatus().observe(this, gpsStatusObserver);
+
         // -------------------------------------------------------------------------------------- //
         //                                     MS2 Stuff Below                                    //
         // -------------------------------------------------------------------------------------- //
