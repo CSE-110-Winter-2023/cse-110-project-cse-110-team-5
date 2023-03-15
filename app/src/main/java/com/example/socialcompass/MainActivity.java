@@ -20,6 +20,7 @@ import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Hashtable<String, String> invisibleLabels;
     private MainActivityViewModel viewModel;
     private Location userLocation;
+
+    private LocationAPI locationAPI;
     private int zoomScale;
     private ImageView connectionMarker;
     private TextView disconnectionTime;
@@ -357,9 +360,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     }
 
     public void onMockUrlSaveButtonClicked(View view) {
-        LocationAPI locationAPI = new LocationAPI();
+        locationAPI = new LocationAPI();
         TextView newURL = findViewById(R.id.mockUrl);
         String url = newURL.getText().toString();
         locationAPI.ChangeBaseUrl(url);
+    }
+
+    public void onMockResetButtonClicked(View view) {
+        locationAPI = new LocationAPI();
+        locationAPI.ResetBaseUrl();
     }
 }
