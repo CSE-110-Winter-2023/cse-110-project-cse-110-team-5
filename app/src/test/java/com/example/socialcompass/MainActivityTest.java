@@ -8,13 +8,18 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.app.AlertDialog;
+import android.content.ComponentName;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.GrantPermissionRule;
 
 import org.junit.Before;
@@ -22,6 +27,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.Shadows;
+import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlertDialog;
 
 @RunWith(RobolectricTestRunner.class)
@@ -60,6 +67,20 @@ public class MainActivityTest {
         scenario.onActivity(activity -> {
             ImageView arrow = activity.findViewById(R.id.arrow);
             assertEquals(0, (int)arrow.getRotation());
+        });
+    }
+
+    @Test
+    public void testAddFriendsButtonOpensActivity(){
+        scenario.onActivity(activity -> {
+            Button button = activity.findViewById(R.id.addFriendButton);
+            button.performClick();
+
+            Intent expectedIntent = new Intent(activity, AddFriendActivity.class);
+            ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+            Intent actualIntent = shadowActivity.getNextStartedActivity();
+
+            assertEquals(expectedIntent.getComponent(), actualIntent.getComponent());
         });
     }
 
