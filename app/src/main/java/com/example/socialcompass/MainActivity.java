@@ -11,6 +11,7 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Rect;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -35,10 +36,10 @@ import com.example.socialcompass.model.Location;
 import com.example.socialcompass.model.LocationAPI;
 import com.example.socialcompass.viewmodel.MainActivityViewModel;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Timer;
-
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     // Constants
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Hashtable<String, Float> markerDistances;
     private Hashtable<String, View> markers;
     private Hashtable<String, String> invisibleLabels;
+    ArrayList<TextView> visibleLabels = new ArrayList<TextView>();
     private MainActivityViewModel viewModel;
     private Location userLocation;
 
@@ -372,5 +374,40 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onMockResetButtonClicked(View view) {
         locationAPI = new LocationAPI();
         locationAPI.ResetBaseUrl();
+    }
+    public void checkOverlapLabels() {
+        markers.forEach((k, v) -> {
+            if(((TextView)v).getText() != "⬤") {
+                ((TextView)v).getGlobalVisibleRect(new Rect());
+            }
+        });
+
+        int visibleLabelsSize = visibleLabels.size();
+        for(int i=0 ; i<visibleLabelsSize ; i++) {
+            Rect rect1 = new Rect();
+            (visibleLabels.get(i)).getGlobalVisibleRect(rect1);
+            for(int j=1 ; j<visibleLabelsSize ; j++) {
+                Rect rect2 = new Rect();
+                (visibleLabels.get(j)).getGlobalVisibleRect(rect2);
+                if(rect1.intersect(rect2)) {
+                    truncateOverlapLabels(rect1, rect2, i, j);
+                }
+            }
+        }
+    }
+
+    public void truncateOverlapLabels(Rect rect1, Rect rect2, int i, int j) {
+        if(rect1.bottom > rect2.top && rect1.right > rect2.left) {
+            String text = (visibleLabels.get(i)).getText().toString();
+            int length = text.length();
+            int endIndex = (length * (rect1.bottom - rect2.top)) / rect1.height();
+            (visibleLabels.get(i)).setText(text.substring(0, endIndex) + "...");
+        }
+        else {
+            String text = (visibleLabels.get(j)).getText().toString();
+            int length = text.length();
+            int endIndex = (length * (rect2.bottom - rect1.top)) / rect2.height();
+            (visibleLabels.get(j)).setText(text.substring(0, endIndex) + "...");
+        }
     }
 }
