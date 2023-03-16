@@ -363,6 +363,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         locationAPI = new LocationAPI();
         TextView newURL = findViewById(R.id.mockUrl);
         String url = newURL.getText().toString();
+        if(url.equals("") || url.equals(null)){
+            return;
+        }
         locationAPI.ChangeBaseUrl(url);
     }
 
