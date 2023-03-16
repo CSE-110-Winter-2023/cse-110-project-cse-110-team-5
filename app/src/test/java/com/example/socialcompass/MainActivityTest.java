@@ -59,7 +59,7 @@ public class MainActivityTest {
     public void testArrowOrientatedNorth(){
         scenario.onActivity(activity -> {
             ImageView arrow = activity.findViewById(R.id.arrow);
-            assertEquals((int)arrow.getRotation(), 90);
+            assertEquals(0, (int)arrow.getRotation());
         });
     }
 
