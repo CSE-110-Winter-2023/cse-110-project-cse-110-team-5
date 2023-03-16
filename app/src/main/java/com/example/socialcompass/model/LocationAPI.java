@@ -12,7 +12,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 
 public class LocationAPI {
-    private final static String BASE_URL = "https://socialcompass.goto.ucsd.edu/";
+    private static String BASE_URL = "https://socialcompass.goto.ucsd.edu/";
+    private final static String ORIGINAL_URL = "https://socialcompass.goto.ucsd.edu/";
     private final static String LOCATION_ENDPOINT = "location/";
     private final static String LOCATIONS_ENDPOINT = "locations";
     public final static int SUCCESS_CODE = 200;
@@ -470,5 +471,14 @@ public class LocationAPI {
                 return null;
             }
         });
+    }
+
+    // method to change the BASE_URL field to what is inputted for the mock
+    public void ChangeBaseUrl(String newBaseUrl) {
+        this.BASE_URL = newBaseUrl;
+    }
+
+    public void ResetBaseUrl(){
+        this.BASE_URL = ORIGINAL_URL;
     }
 }
