@@ -95,7 +95,7 @@
         android:layout_marginBottom="58dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Mock endpoint (URL)"
+        android:hint="Mock endpoint (URL)"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/mockUrlSaveButton"
         app:layout_constraintStart_toStartOf="parent"
