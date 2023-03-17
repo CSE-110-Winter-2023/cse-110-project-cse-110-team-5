@@ -18,7 +18,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -305,7 +304,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private void setMarkerDistance(String key) {
         if (!markerDistances.containsKey(key))
             return;
-        Log.d("SET MARKER DIST", "key: " + key);
         double distance = this.markerDistances.get(key);
         View view = markers.get(key);
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)view.getLayoutParams();
@@ -350,10 +348,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 break;
             }
             collision = false;
-            Log.d("more test", "test1: " + key);
             var angle = (float) markerDegrees.get(key);
             for (String otherKey : markers.keySet()) {
-                Log.d("more test", "test2: " + otherKey);
                 if (markerDisplayDistances.containsKey(otherKey)
                         && markerDegrees.containsKey(otherKey)) {
                     var otherRadiusMultiplier = markerDisplayDistances.get(otherKey);
@@ -362,7 +358,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     var radiusDiff = Math.abs(radiusMultiplier - otherRadiusMultiplier);
                     var angleDiff = Math.abs(angle - otherAngle);
                     if (radiusDiff <= COLLISION_RADIUS_EPSILON && angleDiff <= COLLISION_ANGLE_EPSILON) {
-                        Log.d("COLLISSION TEST", "collision! curr key: " + key + " other key: " + otherKey);
                         collision = true;
                         radiusMultiplier += COLLISION_RADIUS_EPSILON;
                         break;
@@ -372,7 +367,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         } while (collision);
         markerDisplayDistances.put(key, radiusMultiplier);
         int finalRadius = (int)( radiusMultiplier * MAX_CIRCLE_RADIUS);
-        // Log.d("RADIUS DEBUG", "radius " + finalRadius);
         ValueAnimator anim = ValueAnimator.ofInt(initialRadius, finalRadius);
         anim.addUpdateListener(valueAnimator -> {
             layoutParams.circleRadius = (Integer) valueAnimator.getAnimatedValue();
