@@ -18,7 +18,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -54,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private static final int RING2_DIST = 10;
     private static final int RING3_DIST = 500;
     private static final int RING4_DIST = 12450;
+    private static final double COLLISION_ANGLE_EPSILON = Math.toRadians(5);
+    private static final double COLLISION_RADIUS_EPSILON = 0.05;
 
     // Instance variables
     private LocationService locationService;
@@ -66,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Hashtable<String, View> markers;
     private Hashtable<String, String> invisibleLabels;
     private Hashtable<String, String> markerLabels;
+    private Hashtable<String, Double> markerDisplayDistances;
     private MainActivityViewModel viewModel;
     private Location userLocation;
     private LocationAPI locationAPI;
@@ -204,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markerDistances = new Hashtable<>();
         invisibleLabels = new Hashtable<>();
         markerLabels = new Hashtable<>();
+        markerDisplayDistances = new Hashtable<>();
         ring = 2;
         connectionMarker = findViewById(R.id.connectionImageView);
         disconnectionTime = findViewById(R.id.disconnectionTimeTextView);
@@ -325,7 +328,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
             default: throw new RuntimeException("Impossible.");
         }
-        Log.d("DIST TEST", "dist " + distance);
         if (distance >= maxDist) {
             if (!invisibleLabels.containsKey(key)) {
                 layoutParams.circleRadius = OUTSIDE_CIRCLE_RADIUS;
@@ -339,8 +341,32 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             ((TextView)view).setText(invisibleLabels.get(key));
             invisibleLabels.remove(key);
         }
+        this.markerDisplayDistances.remove(key);
+        boolean collision;
+        do {
+            if (!markerDegrees.containsKey(key)) {
+                break;
+            }
+            collision = false;
+            var angle = (float) markerDegrees.get(key);
+            for (String otherKey : markers.keySet()) {
+                if (markerDisplayDistances.containsKey(otherKey)
+                        && markerDegrees.containsKey(otherKey)) {
+                    var otherRadiusMultiplier = markerDisplayDistances.get(otherKey);
+                    var otherAngle = (float) markerDegrees.get(otherKey);
+
+                    var radiusDiff = Math.abs(radiusMultiplier - otherRadiusMultiplier);
+                    var angleDiff = Math.abs(angle - otherAngle);
+                    if (radiusDiff <= COLLISION_RADIUS_EPSILON && angleDiff <= COLLISION_ANGLE_EPSILON) {
+                        collision = true;
+                        radiusMultiplier += COLLISION_RADIUS_EPSILON;
+                        break;
+                    }
+                }
+            }
+        } while (collision);
+        markerDisplayDistances.put(key, radiusMultiplier);
         int finalRadius = (int)( radiusMultiplier * MAX_CIRCLE_RADIUS);
-        // Log.d("RADIUS DEBUG", "radius " + finalRadius);
         ValueAnimator anim = ValueAnimator.ofInt(initialRadius, finalRadius);
         anim.addUpdateListener(valueAnimator -> {
             layoutParams.circleRadius = (Integer) valueAnimator.getAnimatedValue();
@@ -377,6 +403,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         double multiplierDisplace = ((double) (ringLocation - 1)) / maxRing;
         return multiplierDisplace + (ringDist / maxRing);
+    }
+
+    private void stackNearbyMarkers() {
+
     }
 
     /**
