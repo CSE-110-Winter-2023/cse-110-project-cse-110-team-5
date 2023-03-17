@@ -6,6 +6,8 @@
 package com.example.socialcompass;
 
 import android.Manifest;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +18,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -41,11 +44,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     // Constants
     private static final int NO_LOCATION = -1;
     private static final int ANIMATION_DURATION = 210;
-    private static final int MAX_CIRCLE_RADIUS = 543;
+    private static final int MAX_CIRCLE_RADIUS = 615;
+    private static final int OUTSIDE_CIRCLE_RADIUS = 670;
 
     // SharedPreferences keys
     private static final String NAME_KEY = "name";
     private static final String UID_KEY = "uid";
+    private static final int RING1_DIST = 1;
+    private static final int RING2_DIST = 10;
+    private static final int RING3_DIST = 500;
+    private static final int RING4_DIST = 12450;
 
     // Instance variables
     private LocationService locationService;
@@ -61,9 +69,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private MainActivityViewModel viewModel;
     private Location userLocation;
     private LocationAPI locationAPI;
-    private int zoomScale;
     private ImageView connectionMarker;
     private TextView disconnectionTime;
+    static final int MAX_RING_WIDTH_DP = 404;
+    static final int MAX_RING_HEIGHT_DP = 388;
+    private int ring = 2;
 
     private void addMarker(Location location) {
         MarkerBuilder builder = new MarkerBuilder(this);
@@ -194,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markerDistances = new Hashtable<>();
         invisibleLabels = new Hashtable<>();
         markerLabels = new Hashtable<>();
-        zoomScale = 10;
+        ring = 2;
         connectionMarker = findViewById(R.id.connectionImageView);
         disconnectionTime = findViewById(R.id.disconnectionTimeTextView);
 
@@ -242,7 +252,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         //
         // search up "Write asynchronous DAO queries" and "LiveData" and "ViewModel" if
         // you haven't already
-
+        this.updateRings(0);
     }
 
     public void onAddFriendButtonClick(View view) {
@@ -295,28 +305,78 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         View view = markers.get(key);
         ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams)view.getLayoutParams();
         int initialRadius = layoutParams.circleRadius;
-        double radiusMultiplier = (distance / this.zoomScale);
-        if (radiusMultiplier >= 1) {
+        int maxDist;
+        switch (this.ring) {
+            case 1: {
+                maxDist = RING1_DIST;
+                break;
+            }
+            case 2: {
+                maxDist = RING2_DIST;
+                break;
+            }
+            case 3: {
+                maxDist = RING3_DIST;
+                break;
+            }
+            case 4: {
+                maxDist = RING4_DIST; // circumference of the earth
+                break;
+            }
+            default: throw new RuntimeException("Impossible.");
+        }
+        Log.d("DIST TEST", "dist " + distance);
+        if (distance >= maxDist) {
             if (!invisibleLabels.containsKey(key)) {
-                layoutParams.circleRadius = MAX_CIRCLE_RADIUS;
+                layoutParams.circleRadius = OUTSIDE_CIRCLE_RADIUS;
                 invisibleLabels.put(key, (String)((TextView)markers.get(key)).getText());
                 ((TextView)view).setText("⬤");
             }
             return;
         }
+        double radiusMultiplier = calculateRadiusMultiplier(distance, this.ring);
         if (invisibleLabels.containsKey(key)) {
             ((TextView)view).setText(invisibleLabels.get(key));
             invisibleLabels.remove(key);
         }
         int finalRadius = (int)( radiusMultiplier * MAX_CIRCLE_RADIUS);
+        // Log.d("RADIUS DEBUG", "radius " + finalRadius);
         ValueAnimator anim = ValueAnimator.ofInt(initialRadius, finalRadius);
         anim.addUpdateListener(valueAnimator -> {
             layoutParams.circleRadius = (Integer) valueAnimator.getAnimatedValue();
             view.setLayoutParams(layoutParams);
         });
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                layoutParams.circleRadius = finalRadius;
+                view.setLayoutParams(layoutParams);
+            }
+        });
         anim.setDuration(ANIMATION_DURATION);
         anim.setInterpolator(new LinearInterpolator());
         anim.start();
+    }
+
+    private static double calculateRadiusMultiplier(double markerDist, int maxRing) {
+        double ringDist;
+        int ringLocation;
+        if (markerDist <= RING1_DIST) {
+            ringDist = markerDist;
+            ringLocation = 1;
+        } else if (markerDist <= RING2_DIST) {
+            ringDist = (markerDist - RING1_DIST) / (RING2_DIST - RING1_DIST);
+            ringLocation = 2;
+        } else if (markerDist <= RING3_DIST) {
+            ringDist = (markerDist - RING2_DIST) / (RING3_DIST - RING2_DIST);
+            ringLocation = 3;
+        } else {
+            ringDist = (markerDist - RING3_DIST) / (RING4_DIST - RING3_DIST);
+            ringLocation = 4;
+        }
+
+        double multiplierDisplace = ((double) (ringLocation - 1)) / maxRing;
+        return multiplierDisplace + (ringDist / maxRing);
     }
 
     /**
@@ -424,5 +484,71 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             int endIndex = (int)Math.ceil(length * (pos2[0] - pos1[0]) / (float) (val1.getMeasuredWidth() * 2));
             val1.setText(label.substring(0, endIndex));
         }
+    }
+}
+
+    public void onZoomIn(View view) {
+        if (this.ring > 1) {
+            this.ring--;
+            this.updateRings(this.ring + 1);
+            this.updateButtons();
+            this.updateAllMarkers();
+        }
+    }
+
+    public void onZoomOut(View view) {
+        if (this.ring < 4) {
+            this.ring++;
+            this.updateRings(this.ring - 1);
+            this.updateButtons();
+            this.updateAllMarkers();
+        }
+    }
+
+    public void updateAllMarkers() {
+        for (String markerKey : this.markers.keySet()) {
+            this.setMarkerDistance(markerKey);
+        }
+    }
+
+    public void updateButtons() {
+        Button zoomIn = findViewById(R.id.btn_zoom_in);
+        zoomIn.setClickable(ring > 1);
+        Button zoomOut = findViewById(R.id.btn_zoom_out);
+        zoomOut.setClickable(ring < 4);
+    }
+
+    public void updateRings(int previousRing) {
+        ImageView ring4 = findViewById(R.id.circle);
+        ImageView ring3 = findViewById(R.id.circle2);
+        ImageView ring2 = findViewById(R.id.circle3);
+        ImageView ring1 = findViewById(R.id.circle4);
+
+        var ring4Layout = ring4.getLayoutParams();
+        ring4Layout.width = Util.dpToPx(MAX_RING_WIDTH_DP, this);
+        ring4Layout.height = Util.dpToPx(MAX_RING_HEIGHT_DP, this);
+
+        updateSingleRing(ring1, 1, previousRing);
+        updateSingleRing(ring2, 2, previousRing);
+        updateSingleRing(ring3, 3, previousRing);
+    }
+
+    public void updateSingleRing(ImageView ring, int ringNum, int previousRing) {
+        float oldScale = 0;
+        if (previousRing != 0) {
+            oldScale = Math.min(1, ((float) ringNum) / previousRing);
+        }
+        var newScale = Math.min(1, ((float) ringNum) / this.ring);
+        var animator = ValueAnimator.ofFloat(oldScale, newScale);
+        var params = ring.getLayoutParams();
+        animator.addUpdateListener(anim -> {
+            var val = (float) anim.getAnimatedValue();
+            params.width = Util.dpToPx((int) (val * MAX_RING_WIDTH_DP), this);
+            params.height = Util.dpToPx((int) (val * MAX_RING_HEIGHT_DP), this);
+            ring.setLayoutParams(params);
+        });
+        animator.setDuration(ANIMATION_DURATION);
+        animator.setInterpolator(new LinearInterpolator());
+        animator.start();
     }
 }
