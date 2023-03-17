@@ -485,7 +485,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             val1.setText(label.substring(0, endIndex));
         }
     }
-}
 
     public void onZoomIn(View view) {
         if (this.ring > 1) {
