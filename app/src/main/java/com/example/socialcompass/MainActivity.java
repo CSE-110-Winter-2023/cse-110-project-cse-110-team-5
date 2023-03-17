@@ -7,7 +7,6 @@ package com.example.socialcompass;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,12 +15,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -36,10 +33,9 @@ import com.example.socialcompass.model.Location;
 import com.example.socialcompass.model.LocationAPI;
 import com.example.socialcompass.viewmodel.MainActivityViewModel;
 
-import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     // Constants
@@ -55,19 +51,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private LocationService locationService;
     private SensorManager sensorManager;
     private Sensor magneticFieldSensor;
-    private Timer timer;
-    private ConnectivityManager connectivityManager;
-    private BroadcastReceiver connectivityReceiver;
     private SharedPreferences preferences;
     private Hashtable<String, Float> markerDegrees;
     private Hashtable<String, Float> markerOffsets;
     private Hashtable<String, Float> markerDistances;
     private Hashtable<String, View> markers;
     private Hashtable<String, String> invisibleLabels;
-    ArrayList<TextView> visibleLabels = new ArrayList<TextView>();
+    private Hashtable<String, String> markerLabels;
     private MainActivityViewModel viewModel;
     private Location userLocation;
-
     private LocationAPI locationAPI;
     private int zoomScale;
     private ImageView connectionMarker;
@@ -80,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markerDegrees.put(location.publicCode, 0f);
         markerOffsets.put(location.publicCode, 0f);
         markerDistances.put(location.publicCode, 0f);
+        markerLabels.put(location.publicCode, location.label);
     }
 
     protected void updateMarkers(List<Location> locations) {
@@ -97,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             updateAngle(key, latitude, longitude);
             updateDistance(key, latitude, longitude);
         }
+        checkOverlapLabels();
     }
 
     protected void updateAngle(String key, double latitude, double longitude) {
@@ -192,7 +186,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         // Instance variable initialization
         preferences = getSharedPreferences("shared", MODE_PRIVATE);
-        connectivityManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         magneticFieldSensor = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         markers = new Hashtable<>();
@@ -200,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         markerOffsets = new Hashtable<>();
         markerDistances = new Hashtable<>();
         invisibleLabels = new Hashtable<>();
+        markerLabels = new Hashtable<>();
         zoomScale = 10;
         connectionMarker = findViewById(R.id.connectionImageView);
         disconnectionTime = findViewById(R.id.disconnectionTimeTextView);
@@ -375,39 +369,60 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         locationAPI = new LocationAPI();
         locationAPI.ResetBaseUrl();
     }
-    public void checkOverlapLabels() {
+
+    private Hashtable<String, TextView> getVisibleMarkers() {
+        Hashtable<String, TextView> visibleLabels = new Hashtable<>();
         markers.forEach((k, v) -> {
             if(((TextView)v).getText() != "⬤") {
-                ((TextView)v).getGlobalVisibleRect(new Rect());
+                visibleLabels.put(k, (TextView)v);
             }
         });
+        return visibleLabels;
+    }
 
-        int visibleLabelsSize = visibleLabels.size();
-        for(int i=0 ; i<visibleLabelsSize ; i++) {
+    private void setOverlappingLabels(Hashtable<String, TextView> visible) {
+        Enumeration<String> e1 = visible.keys();
+        while (e1.hasMoreElements()) {
+            String key1 = e1.nextElement();
+            TextView val1 = visible.get(key1);
+            boolean overlaps = false;
             Rect rect1 = new Rect();
-            (visibleLabels.get(i)).getGlobalVisibleRect(rect1);
-            for(int j=1 ; j<visibleLabelsSize ; j++) {
+            val1.getGlobalVisibleRect(rect1);
+            Enumeration<String> e2 = visible.keys();
+            while (e2.hasMoreElements()) {
+                String key2 = e2.nextElement();
+                if (key1.equals(key2))
+                    continue;
+                TextView val2 = visible.get(key2);
                 Rect rect2 = new Rect();
-                (visibleLabels.get(j)).getGlobalVisibleRect(rect2);
-                if(rect1.intersect(rect2)) {
-                    truncateOverlapLabels(rect1, rect2, i, j);
+                val2.getGlobalVisibleRect(rect2);
+                if (rect1.intersect(rect2)) {
+                    truncateOverlapLabels(key1, val1, val2);
+                    overlaps = true;
                 }
+            }
+            if (!overlaps) {
+                val1.setText(markerLabels.get(key1));
             }
         }
     }
+    public void checkOverlapLabels() {
+        Hashtable<String, TextView> visibleLabels = getVisibleMarkers();
+        setOverlappingLabels(visibleLabels);
+    }
 
-    public void truncateOverlapLabels(Rect rect1, Rect rect2, int i, int j) {
-        if(rect1.bottom > rect2.top && rect1.right > rect2.left) {
-            String text = (visibleLabels.get(i)).getText().toString();
-            int length = text.length();
-            int endIndex = (length * (rect1.bottom - rect2.top)) / rect1.height();
-            (visibleLabels.get(i)).setText(text.substring(0, endIndex) + "...");
-        }
-        else {
-            String text = (visibleLabels.get(j)).getText().toString();
-            int length = text.length();
-            int endIndex = (length * (rect2.bottom - rect1.top)) / rect2.height();
-            (visibleLabels.get(j)).setText(text.substring(0, endIndex) + "...");
+    public void truncateOverlapLabels(String key1, TextView val1, TextView val2) {
+        int[] pos1 = new int[2];
+        int[] pos2 = new int[2];
+        val1.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        val2.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        val1.getLocationOnScreen(pos1);
+        val2.getLocationOnScreen(pos2);
+        if (pos1[0] < pos2[0]) {
+            String label = markerLabels.get(key1);
+            int length = label.length();
+            int endIndex = (int)Math.ceil(length * (pos2[0] - pos1[0]) / (float) (val1.getMeasuredWidth() * 2));
+            val1.setText(label.substring(0, endIndex));
         }
     }
 }
